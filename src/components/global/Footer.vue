@@ -1,0 +1,64 @@
+<script setup lang="ts">
+const currentYear = new Date().getFullYear();
+</script>
+
+<template>
+  <footer class="footer">
+    <div class="footer__container">
+      <p class="footer__copy">
+        &copy; {{ currentYear }} Yeyodev. Todos los derechos reservados.
+      </p>
+      <div class="footer__socials">
+        <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+    </div>
+  </footer>
+</template>
+
+<style lang="scss" scoped>
+@use '@/styles/index.scss' as *;
+
+.footer {
+  background-color: $YEYO-BLUE;
+  color: $YEYO-ORANGE;
+  padding: 3rem 1rem;
+  text-align: center;
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  &__copy {
+    font-size: 0.9rem;
+    color: $YEYO-ROSE;
+  }
+
+  &__socials {
+    display: flex;
+    gap: 1.5rem;
+
+    a {
+      color: $white;
+      font-weight: 500;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: $green;
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    .footer__container {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+}
+</style>

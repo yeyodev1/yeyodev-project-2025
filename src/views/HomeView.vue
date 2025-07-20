@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import HeroSection from '@/components/homeSections/HeroSection.vue';
 </script>
 
 <template>
   <main>
-    <TheWelcome />
-  </main>
+    <HeroSection />
+    </main>
 </template>

@@ -1,0 +1,14 @@
+// Importación de fuentes de Google
+@use 'sass:string';
+
+// Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Bitcount:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+// Variables de fuentes
+:root {
+  --font-bitcount: 'Bitcount', sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
+}
+
+$font-principal: 'Bitcount', sans-serif;
+$font-secondary: 'Roboto', sans-serif;
