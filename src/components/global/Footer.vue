@@ -9,8 +9,8 @@ const currentYear = new Date().getFullYear();
         &copy; {{ currentYear }} Yeyodev. Todos los derechos reservados.
       </p>
       <div class="footer__socials">
-        <a href="https://github.com/tu-usuario" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com/yeyodev1" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/yeyodev1" target="_blank" rel="noopener noreferrer">LinkedIn</a>
       </div>
     </div>
   </footer>
