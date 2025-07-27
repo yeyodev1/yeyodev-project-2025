@@ -176,7 +176,12 @@ onMounted(() => {
 
 .stack {
   padding: 8rem 1.5rem;
-  background: linear-gradient(135deg, $YEYO-ORANGE 0%, #f4c2a1 100%);
+  background: linear-gradient(135deg, 
+    $YEYO-ORANGE 0%, 
+    rgba(244, 194, 161, 0.9) 30%,
+    rgba(232, 180, 160, 0.8) 60%,
+    rgba(244, 194, 161, 0.85) 100%
+  );
   position: relative;
   overflow: hidden;
   min-height: 100vh;

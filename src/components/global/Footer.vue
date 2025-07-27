@@ -20,7 +20,12 @@ const currentYear = new Date().getFullYear();
 @use '@/styles/index.scss' as *;
 
 .footer {
-  background-color: $YEYO-BLUE;
+  background: linear-gradient(135deg, 
+    rgba(244, 194, 161, 0.95) 0%, 
+    rgba(232, 180, 160, 0.9) 20%,
+    rgba(74, 78, 105, 0.95) 60%,
+    $YEYO-BLUE 100%
+  );
   color: $YEYO-ORANGE;
   padding: 3rem 1rem;
   text-align: center;

@@ -227,6 +227,8 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+@use '@/styles/index.scss' as *;
+
 // Animaciones sofisticadas
 @keyframes float-gentle {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -352,11 +354,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   background: linear-gradient(135deg, 
-    #0f0f23 0%, 
-    #1a1a2e 25%, 
-    #16213e 50%, 
-    #0f3460 75%, 
-    #533483 100%
+    $YEYO-VIOLET 0%, 
+    rgba(26, 26, 46, 0.95) 25%, 
+    rgba(22, 33, 62, 0.9) 50%, 
+    rgba(15, 52, 96, 0.85) 75%, 
+    rgba(34, 34, 59, 0.8) 100%
   );
   
   // Estado de carga

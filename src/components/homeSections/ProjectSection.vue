@@ -363,11 +363,11 @@ onMounted(() => {
   padding: 120px 0;
   background: linear-gradient(
     135deg,
-    rgba(34, 34, 59, 0.95) 0%,
-    rgba(74, 78, 105, 0.9) 25%,
-    rgba(102, 217, 165, 0.1) 50%,
-    rgba(244, 194, 161, 0.15) 75%,
-    rgba(34, 34, 59, 0.95) 100%
+    rgba(34, 34, 59, 0.8) 0%,
+    rgba(74, 78, 105, 0.85) 25%,
+    rgba(102, 217, 165, 0.15) 50%,
+    rgba(244, 194, 161, 0.2) 75%,
+    $YEYO-ORANGE 100%
   );
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;

@@ -238,7 +238,12 @@ onMounted(() => {
 // Estilos principales
 .about {
   padding: 8rem 1.5rem;
-  background: linear-gradient(135deg, $YEYO-ORANGE 0%, #f4c2a1 50%, #e8b4a0 100%);
+  background: linear-gradient(135deg, 
+    rgba(244, 194, 161, 0.85) 0%, 
+    $YEYO-ORANGE 30%,
+    rgba(232, 180, 160, 0.9) 70%,
+    rgba(244, 194, 161, 0.95) 100%
+  );
   position: relative;
   overflow: hidden;
   min-height: 100vh;
