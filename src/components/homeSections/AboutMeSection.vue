@@ -164,6 +164,54 @@ onMounted(() => {
   }
 }
 
+@keyframes bounce-gentle {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-30px) scale(1.1);
+  }
+  60% {
+    transform: translateY(-15px) scale(1.05);
+  }
+}
+
+@keyframes bounce-rotate {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-25px) rotate(90deg) scale(1.2);
+  }
+  50% {
+    transform: translateY(-40px) rotate(180deg) scale(1.1);
+  }
+  75% {
+    transform: translateY(-15px) rotate(270deg) scale(1.05);
+  }
+}
+
+@keyframes bounce-elastic {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  20% {
+    transform: translateY(-45px) scale(1.25);
+  }
+  40% {
+    transform: translateY(-20px) scale(0.95);
+  }
+  60% {
+    transform: translateY(-35px) scale(1.15);
+  }
+  80% {
+    transform: translateY(-10px) scale(1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes pulse-glow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
@@ -314,37 +362,60 @@ onMounted(() => {
 
 .about__shape {
   position: absolute;
-  animation: float-gentle 6s ease-in-out infinite;
+  cursor: pointer;
+  transition: all 0.3s ease;
 
   &--triangle {
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-bottom: 25px solid rgba(34, 34, 59, 0.1);
+    border-bottom: 25px solid rgba(79, 172, 254, 0.3);
     top: 30%;
     right: 20%;
+    animation: bounce-gentle 4s ease-in-out infinite;
     animation-delay: 1s;
+    
+    &:hover {
+      border-bottom-color: rgba(79, 172, 254, 0.6);
+      animation-play-state: paused;
+      transform: translateY(-10px) scale(1.3);
+    }
   }
 
   &--square {
     width: 20px;
     height: 20px;
-    background: rgba(154, 3, 30, 0.2);
+    background: rgba(79, 172, 254, 0.4);
     top: 70%;
     left: 10%;
+    animation: bounce-rotate 6s ease-in-out infinite;
     animation-delay: 3s;
-    transform: rotate(45deg);
+    border-radius: 2px;
+    
+    &:hover {
+      background: rgba(79, 172, 254, 0.7);
+      animation-play-state: paused;
+      transform: translateY(-15px) rotate(45deg) scale(1.5);
+    }
   }
 
   &--circle {
     width: 12px;
     height: 12px;
-    background: rgba(66, 184, 131, 0.3);
+    background: rgba(0, 242, 254, 0.5);
     border-radius: 50%;
     top: 20%;
     left: 70%;
+    animation: bounce-elastic 5s ease-in-out infinite;
     animation-delay: 5s;
+    
+    &:hover {
+      background: rgba(0, 242, 254, 0.8);
+      animation-play-state: paused;
+      transform: translateY(-20px) scale(2);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+    }
   }
 }
 
