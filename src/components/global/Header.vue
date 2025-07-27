@@ -24,7 +24,7 @@ import BaseButton from '@/components/base/BaseButton.vue';
         </a>
         
         <!-- Botón principal de contacto -->
-        <BaseButton href="https://wa.me/17633524852" variant="primary" class="header__contact-btn">
+        <BaseButton href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" variant="primary" class="header__contact-btn">
           ¡Hablemos!
         </BaseButton>
       </div>
@@ -114,11 +114,10 @@ import BaseButton from '@/components/base/BaseButton.vue';
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1rem;
-    background: linear-gradient(135deg, 
-      rgba(255, 193, 7, 0.9) 0%, 
-      rgba(255, 152, 0, 0.9) 50%,
-      rgba(255, 87, 34, 0.9) 100%
-    );
+    background: linear-gradient(135deg,
+        rgba(255, 193, 7, 0.9) 0%,
+        rgba(255, 152, 0, 0.9) 50%,
+        rgba(255, 87, 34, 0.9) 100%);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 25px;
     color: white;
@@ -130,7 +129,7 @@ import BaseButton from '@/components/base/BaseButton.vue';
     overflow: hidden;
     backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -138,23 +137,22 @@ import BaseButton from '@/components/base/BaseButton.vue';
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.3), 
-        transparent
-      );
+      background: linear-gradient(90deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent);
       transition: left 0.5s ease;
     }
-    
+
     &:hover {
       transform: translateY(-2px) scale(1.05);
       box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
       border-color: rgba(255, 255, 255, 0.4);
-      
+
       &::before {
         left: 100%;
       }
-      
+
       .header__recruiter-icon {
         animation: pulse-target 0.6s ease;
       }
@@ -177,9 +175,12 @@ import BaseButton from '@/components/base/BaseButton.vue';
 }
 
 @keyframes pulse-target {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
@@ -190,12 +191,12 @@ import BaseButton from '@/components/base/BaseButton.vue';
   .header__recruiter-text {
     display: none;
   }
-  
+
   .header__recruiter-btn {
     padding: 0.6rem;
     min-width: auto;
   }
-  
+
   .header__actions {
     gap: 0.5rem;
   }
@@ -209,7 +210,7 @@ import BaseButton from '@/components/base/BaseButton.vue';
   .header__nav {
     display: flex;
   }
-  
+
   .header__actions {
     gap: 1rem;
   }

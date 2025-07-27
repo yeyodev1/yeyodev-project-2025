@@ -21,8 +21,18 @@ const currentYear = new Date().getFullYear();
       </div>
 
       <div class="footer__socials">
-        <a href="https://github.com/yeyodev1" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.linkedin.com/in/yeyodev1" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://github.com/yeyodev1" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/yeyodev1" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="https://www.instagram.com/yeyo.dev/" target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-instagram"></i>
+        </a>
       </div>
     </div>
   </footer>
@@ -150,17 +160,26 @@ const currentYear = new Date().getFullYear();
   &__socials {
     display: flex;
     gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
 
     a {
       color: rgba(255, 255, 255, 0.85);
       font-weight: 500;
       transition: all 0.3s ease;
       position: relative;
-      padding: 0.5rem 1rem;
+      padding: 0.8rem;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i {
+        font-size: 1.4rem;
+      }
 
       &:hover {
         color: #4facfe;
@@ -206,6 +225,18 @@ const currentYear = new Date().getFullYear();
         
         .footer__recruiter-arrow {
           display: none;
+        }
+      }
+    }
+
+    .footer__socials {
+      gap: 1rem;
+      
+      a {
+        padding: 0.6rem;
+        
+        i {
+          font-size: 1.2rem;
         }
       }
     }
