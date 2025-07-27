@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import ProjectCard from '../card/ProjectCard.vue';
+import { useLanguage } from '@/composables/useLanguage';
+
+const { t } = useLanguage();
 
 // Estado y Lógica del Componente
 const sectionContainer = ref<HTMLElement | null>(null);
@@ -134,15 +137,13 @@ onMounted(() => {
       <!-- Header mejorado -->
       <div class="projects__header">
         <div class="projects__header-content">
-          <span class="projects__badge">💼 Portfolio</span>
+          <span class="projects__badge">💼 {{ t('projects.badge') }}</span>
           <h2 class="projects__title">
-            <span class="projects__title-main">Mis</span>
-            <span class="projects__title-accent">Proyectos</span>
+            <span class="projects__title-main">{{ t('projects.title') }}</span>
+            <span class="projects__title-accent">{{ t('projects.titleAccent') }}</span>
           </h2>
           <p class="projects__subtitle">
-            Una selección cuidadosa de mis trabajos más destacados,
-            <br class="projects__subtitle-break">
-            donde la innovación se encuentra con la funcionalidad
+            {{ t('projects.subtitle') }}
           </p>
         </div>
         
@@ -236,10 +237,10 @@ onMounted(() => {
       <!-- Call to action -->
       <div class="projects__cta">
         <p class="projects__cta-text">
-          ¿Tienes un proyecto en mente? ¡Hablemos!
+          {{ t('projects.cta.text') }}
         </p>
         <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" class="projects__cta-button">
-          <span class="projects__cta-button-text">Contactar</span>
+          <span class="projects__cta-button-text">{{ t('projects.cta.button') }}</span>
           <span class="projects__cta-button-icon">→</span>
         </a>
       </div>

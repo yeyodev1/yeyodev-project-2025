@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, computed } from 'vue';
+import { useLanguage } from '@/composables/useLanguage';
 
 interface TerminalLine {
   type: 'command' | 'output' | 'error' | 'info';
   content: string;
   timestamp?: string;
 }
+
+const { t } = useLanguage();
 
 const isOpen = ref(false);
 const currentCommand = ref('');
@@ -15,23 +18,23 @@ const commandInput = ref<HTMLInputElement | null>(null);
 const isTyping = ref(false);
 
 // Comandos disponibles y sus respuestas
-const commands = {
+const commands = computed(() => ({
   help: {
-    description: 'Muestra todos los comandos disponibles',
+    description: t('terminal.commands.help.description'),
     output: [
-      'Comandos disponibles:',
+      t('terminal.commands.help.title'),
       '',
-      '  about        - Información personal de Diego',
-      '  skills       - Lista de tecnologías y habilidades',
-      '  projects     - Proyectos destacados',
-      '  experience   - Experiencia profesional',
-      '  contact      - Información de contacto',
-      '  achievements - Logros y estadísticas',
-      '  tech-stack   - Stack tecnológico actual',
-      '  clear        - Limpia la terminal',
-      '  exit         - Cierra la terminal',
+      t('terminal.commands.help.about'),
+      t('terminal.commands.help.skills'),
+      t('terminal.commands.help.projects'),
+      t('terminal.commands.help.experience'),
+      t('terminal.commands.help.contact'),
+      t('terminal.commands.help.achievements'),
+      t('terminal.commands.help.techStack'),
+      t('terminal.commands.help.clear'),
+      t('terminal.commands.help.exit'),
       '',
-      'Tip: Usa TAB para autocompletar comandos'
+      t('terminal.commands.help.tip')
     ]
   },
   about: {
@@ -184,7 +187,7 @@ const commands = {
       '└── Netlify con CI/CD automático'
     ]
   }
-};
+}));
 
 const addLine = (type: TerminalLine['type'], content: string) => {
   const timestamp = new Date().toLocaleTimeString('es-ES', {
@@ -242,7 +245,7 @@ const executeCommand = async (cmd: string) => {
     return;
   }
 
-  const command = commands[trimmedCmd as keyof typeof commands];
+  const command = commands.value[trimmedCmd as keyof typeof commands.value];
 
   if (command) {
     await typeWriter(command.output, 10);
@@ -320,7 +323,7 @@ onMounted(() => {
         title="¿Eres programador, entra aquí? Abre la terminal"
       >
         <span class="dev-terminal__trigger-icon">💻</span>
-        <span class="dev-terminal__trigger-text">¿Eres programador, entra aquí?</span>
+        <span class="dev-terminal__trigger-text">{{ t('terminal.trigger.text') }}</span>
       </button>
     </Transition>
 
@@ -363,7 +366,7 @@ onMounted(() => {
                 v-model="currentCommand"
                 @keypress="handleKeyPress"
                 class="dev-terminal__input"
-                placeholder="Escribe un comando..."
+                :placeholder="t('terminal.input.placeholder')"
                 :disabled="isTyping"
                 autocomplete="off"
                 spellcheck="false"

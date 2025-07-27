@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useLanguage } from '@/composables/useLanguage';
+
+const { t } = useLanguage();
 const currentYear = new Date().getFullYear();
 </script>
 
@@ -6,15 +9,15 @@ const currentYear = new Date().getFullYear();
   <footer class="footer">
     <div class="footer__container">
       <p class="footer__copy">
-        &copy; {{ currentYear }} Yeyodev. Todos los derechos reservados.
+        &copy; {{ currentYear }} Yeyodev. {{ t('footer.copyright') }}
       </p>
       <!-- Botón especial para reclutadores -->
       <div class="footer__recruiter">
         <a href="https://www.self.so/yeyodev" target="_blank" rel="noopener noreferrer" class="footer__recruiter-btn">
           <span class="footer__recruiter-icon">👀</span>
           <span class="footer__recruiter-text">
-            <strong>¿Eres reclutador y solo quieres ver qué he hecho?</strong>
-            <small>Presiona aquí para mi perfil completo</small>
+            <strong>{{ t('footer.recruiter.question') }}</strong>
+            <small>{{ t('footer.recruiter.action') }}</small>
           </span>
           <span class="footer__recruiter-arrow">→</span>
         </a>

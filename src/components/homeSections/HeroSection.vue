@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import BaseButton from '@/components/base/BaseButton.vue';
+import { useLanguage } from '@/composables/useLanguage';
 
 // Estado y lógica del componente
 const heroContainer = ref<HTMLElement | null>(null);
@@ -8,13 +9,15 @@ const mousePosition = ref({ x: 0, y: 0 });
 const isLoaded = ref(false);
 const currentRole = ref(0);
 
+const { t } = useLanguage();
+
 // Roles que se van alternando
-const roles = [
-  'Full-Stack Developer',
-  'Frontend Specialist',
+const roles = computed(() => [
+  t('hero.roles.fullstack'),
+  t('hero.roles.frontend'),
   'Vue.js Expert',
-  'UI/UX Enthusiast'
-];
+  t('hero.roles.uiux')
+]);
 
 // Estadísticas del hero
 const heroStats = [
@@ -38,7 +41,7 @@ const handleMouseMove = (event: MouseEvent) => {
 // Cambio automático de roles
 const rotateRoles = () => {
   setInterval(() => {
-    currentRole.value = (currentRole.value + 1) % roles.length;
+    currentRole.value = (currentRole.value + 1) % roles.value.length;
   }, 3000);
 };
 
@@ -107,12 +110,12 @@ onMounted(() => {
         <!-- Título principal con efectos -->
         <div class="hero__title-section">
           <div class="hero__greeting">
-            <span class="hero__greeting-text">¡Hola! Soy</span>
+            <span class="hero__greeting-text">{{ t('hero.greeting') }}</span>
           </div>
           
           <div class="hero__title-mask">
             <h1 class="hero__title">
-              <span class="hero__name">Diego Reyes</span>
+              <span class="hero__name">{{ t('hero.name') }}</span>
             </h1>
           </div>
           
@@ -135,9 +138,7 @@ onMounted(() => {
         <!-- Descripción mejorada -->
         <div class="hero__description">
           <p class="hero__subtitle">
-            Especializado en crear <strong>aplicaciones web modernas</strong> y 
-            <strong>experiencias digitales excepcionales</strong> que combinan 
-            funcionalidad, rendimiento y diseño elegante.
+            {{ t('hero.description') }}
           </p>
           
           <div class="hero__highlights">
@@ -151,11 +152,11 @@ onMounted(() => {
         <!-- Acciones principales -->
         <div class="hero__actions">
           <BaseButton href="#projects" variant="primary" class="hero__cta-primary">
-            <span class="hero__cta-text">Ver Mis Proyectos</span>
+            <span class="hero__cta-text">{{ t('buttons.viewProjects') }}</span>
             <span class="hero__cta-icon">→</span>
           </BaseButton>
           <BaseButton href="/cv.pdf" variant="secondary" class="hero__cta-secondary">
-            <span class="hero__cta-text">Descargar CV</span>
+            <span class="hero__cta-text">{{ t('buttons.downloadCV') }}</span>
             <span class="hero__cta-icon">📄</span>
           </BaseButton>
         </div>
@@ -167,8 +168,8 @@ onMounted(() => {
             <div class="hero__recruiter-content">
               <span class="hero__recruiter-icon">💼</span>
               <div class="hero__recruiter-text">
-                <strong>¿Hiring?</strong>
-                <small>Click aquí</small>
+                <strong>{{ t('hero.hiringBadge.question') }}</strong>
+                <small>{{ t('hero.hiringBadge.action') }}</small>
               </div>
             </div>
           </a>

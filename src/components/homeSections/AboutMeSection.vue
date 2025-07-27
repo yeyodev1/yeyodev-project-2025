@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useLanguage } from '@/composables/useLanguage';
+
+const { t } = useLanguage();
 
 // Lógica del Intersection Observer para la animación al hacer scroll
 const sectionContainer = ref<HTMLElement | null>(null);
@@ -7,20 +10,20 @@ const isVisible = ref(false);
 const mousePosition = ref({ x: 0, y: 0 });
 
 // Datos de habilidades y logros
-const achievements = ref([
-  { number: '50+', label: 'Proyectos Completados', icon: '🚀' },
-  { number: '3+', label: 'Años de Experiencia', icon: '⏰' },
-  { number: '15+', label: 'Tecnologías Dominadas', icon: '💻' },
-  { number: '100%', label: 'Dedicación', icon: '❤️' }
+const achievements = computed(() => [
+  { number: '50+', label: t('about.achievements.projects'), icon: '🚀' },
+  { number: '3+', label: t('about.achievements.experience'), icon: '⏰' },
+  { number: '15+', label: t('about.achievements.technologies'), icon: '💻' },
+  { number: '100%', label: t('about.achievements.dedication'), icon: '❤️' }
 ]);
 
-const skills = ref([
-  'Arquitectura de Software',
-  'Clean Code',
-  'Metodologías Ágiles',
-  'Liderazgo Técnico',
-  'Optimización de Performance',
-  'Testing & QA'
+const skills = computed(() => [
+  t('about.skills.architecture'),
+  t('about.skills.cleanCode'),
+  t('about.skills.agile'),
+  t('about.skills.leadership'),
+  t('about.skills.performance'),
+  t('about.skills.testing')
 ]);
 
 // Manejo del mouse para efectos parallax
@@ -70,8 +73,8 @@ onMounted(() => {
       <!-- Header con efectos de texto -->
       <div class="about__header">
         <h2 class="about__title">
-          <span class="about__title-line">Sobre</span>
-          <span class="about__title-line about__title-line--accent">Mí</span>
+          <span class="about__title-line">{{ t('about.title') }}</span>
+          <span class="about__title-line about__title-line--accent">{{ t('about.titleAccent') }}</span>
         </h2>
         <div class="about__title-decoration"></div>
       </div>
@@ -82,18 +85,9 @@ onMounted(() => {
         <div class="about__content-section">
           <div class="about__text-content">
             <div class="about__intro">
-              <p class="about__intro-text">
-                ¡Hola! Soy <strong>Diego</strong>, un desarrollador de software con una profunda pasión por la 
-                <span class="about__highlight">arquitectura de sistemas</span> y la creación de experiencias de usuario memorables.
-              </p>
-              <p class="about__intro-text">
-                Mi enfoque se centra en escribir <span class="about__highlight">código limpio, escalable y bien documentado</span>, 
-                aplicando principios sólidos para construir productos que no solo funcionen hoy, sino que sean fáciles de mantener y evolucionar mañana.
-              </p>
-              <p class="about__intro-text">
-                Disfruto desentrañando problemas complejos y traduciendo ideas en soluciones tecnológicas robustas. 
-                Siempre estoy explorando nuevas herramientas y paradigmas para mantenerme a la vanguardia.
-              </p>
+              <p class="about__intro-text" v-html="t('about.intro.paragraph1')"></p>
+              <p class="about__intro-text" v-html="t('about.intro.paragraph2')"></p>
+              <p class="about__intro-text" v-html="t('about.intro.paragraph3')"></p>
             </div>
 
             <!-- Lista de habilidades -->

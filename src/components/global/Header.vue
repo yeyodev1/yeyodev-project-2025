@@ -1,6 +1,13 @@
 <script setup lang="ts">
-import BaseButton from '@/components/base/BaseButton.vue';
-// En un futuro, podrías usar ref y un watcher para manejar el estado del menú móvil
+import { onMounted } from 'vue'
+import BaseButton from '@/components/base/BaseButton.vue'
+import { useLanguage } from '@/composables/useLanguage'
+
+const { t, toggleLanguage, languageLabel, languageFlag, initializeLanguage } = useLanguage()
+
+onMounted(() => {
+  initializeLanguage()
+})
 </script>
 
 <template>
@@ -10,22 +17,28 @@ import BaseButton from '@/components/base/BaseButton.vue';
         yeyodev<span class="header__logo--dot">.</span>
       </a>
       <nav class="header__nav">
-        <a href="#projects">Proyectos</a>
-        <a href="#about">Sobre Mí</a>
-        <a href="#contact">Contacto</a>
+        <a href="#projects">{{ t('nav.projects') }}</a>
+        <a href="#about">{{ t('nav.about') }}</a>
+        <a href="#contact">{{ t('nav.contact') }}</a>
       </nav>
       
       <!-- Botones de acción -->
       <div class="header__actions">
+        <!-- Botón de cambio de idioma -->
+        <button @click="toggleLanguage" class="header__language-btn" :title="`Switch to ${languageLabel}`">
+          <span class="header__language-flag">{{ languageFlag }}</span>
+          <span class="header__language-text">{{ languageLabel }}</span>
+        </button>
+        
         <!-- Botón especial para reclutadores -->
         <a href="https://www.self.so/yeyodev" target="_blank" rel="noopener noreferrer" class="header__recruiter-btn">
           <span class="header__recruiter-icon">🎯</span>
-          <span class="header__recruiter-text">Para Reclutadores</span>
+          <span class="header__recruiter-text">{{ t('buttons.forRecruiters') }}</span>
         </a>
         
         <!-- Botón principal de contacto -->
         <BaseButton href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" variant="primary" class="header__contact-btn">
-          ¡Hablemos!
+          {{ t('buttons.letsTalk') }}
         </BaseButton>
       </div>
       </div>
@@ -109,6 +122,47 @@ import BaseButton from '@/components/base/BaseButton.vue';
     gap: 0.75rem;
   }
 
+  &__language-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(79, 172, 254, 0.5);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(79, 172, 254, 0.2);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__language-flag {
+    font-size: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  &__language-text {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  &__language-btn:hover &__language-flag {
+    transform: scale(1.1);
+  }
+
   &__recruiter-btn {
     display: flex;
     align-items: center;
@@ -188,17 +242,26 @@ import BaseButton from '@/components/base/BaseButton.vue';
 
 // --- Estilos para pantallas más grandes ---
 @media (max-width: 767px) {
+  .header__language-text {
+    display: none;
+  }
+  
+  .header__language-btn {
+    padding: 0.5rem;
+    min-width: auto;
+  }
+  
   .header__recruiter-text {
     display: none;
   }
-
+  
   .header__recruiter-btn {
     padding: 0.6rem;
     min-width: auto;
   }
-
+  
   .header__actions {
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 }
 
