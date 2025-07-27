@@ -24,7 +24,7 @@ import BaseButton from '@/components/base/BaseButton.vue';
         </a>
         
         <!-- Botón principal de contacto -->
-        <BaseButton href="mailto:tu.email@example.com" variant="primary" class="header__contact-btn">
+        <BaseButton href="https://wa.me/17633524852" variant="primary" class="header__contact-btn">
           ¡Hablemos!
         </BaseButton>
       </div>

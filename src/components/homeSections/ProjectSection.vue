@@ -238,10 +238,10 @@ onMounted(() => {
         <p class="projects__cta-text">
           ¿Tienes un proyecto en mente? ¡Hablemos!
         </p>
-        <button class="projects__cta-button">
+        <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" class="projects__cta-button">
           <span class="projects__cta-button-text">Contactar</span>
           <span class="projects__cta-button-icon">→</span>
-        </button>
+        </a>
       </div>
     </div>
   </section>
