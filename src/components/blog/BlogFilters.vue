@@ -23,12 +23,11 @@ const { t } = useLanguage();
 
 // Estados locales
 const isSearchFocused = ref(false);
-const showMobileFilters = ref(false);
 
 // Computed properties
 const allCategories = computed(() => [
   { id: 'all', name: t('blog.filters.allCategories'), slug: 'all', description: '', count: 0 },
-  ...props.categories
+  ...(props.categories || [])
 ]);
 
 const hasActiveFilters = computed(() => {
@@ -39,7 +38,6 @@ const hasActiveFilters = computed(() => {
 const handleCategoryClick = (categorySlug: string) => {
   const category = categorySlug === 'all' ? '' : categorySlug;
   emit('categoryChange', category);
-  showMobileFilters.value = false;
 };
 
 const handleSearchInput = (event: Event) => {
@@ -57,9 +55,7 @@ const clearAllFilters = () => {
   emit('searchChange', '');
 };
 
-const toggleMobileFilters = () => {
-  showMobileFilters.value = !showMobileFilters.value;
-};
+
 </script>
 
 <template>
@@ -113,18 +109,7 @@ const toggleMobileFilters = () => {
           </svg>
         </button>
         
-        <!-- Botón de filtros móvil -->
-        <button 
-          @click="toggleMobileFilters"
-          class="mobile-filters-toggle"
-          :class="{ 'mobile-filters-toggle--active': showMobileFilters }"
-        >
-          <svg class="filter-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M22 3H2L10 12.46V19L14 21V12.46L22 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>{{ t('blog.filters.filters') }}</span>
-          <span v-if="hasActiveFilters" class="active-indicator"></span>
-        </button>
+
       </div>
     </div>
     
@@ -162,57 +147,7 @@ const toggleMobileFilters = () => {
       </button>
     </div>
     
-    <!-- Panel de filtros móvil -->
-    <div 
-      class="mobile-filters-panel"
-      :class="{ 'mobile-filters-panel--open': showMobileFilters }"
-    >
-      <div class="mobile-filters-content">
-        <div class="mobile-filters-header">
-          <h3>{{ t('blog.filters.categories') }}</h3>
-          <button 
-            @click="toggleMobileFilters"
-            class="mobile-filters-close"
-          >
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="mobile-categories">
-          <button
-            v-for="category in allCategories"
-            :key="category.id"
-            @click="handleCategoryClick(category.slug)"
-            class="mobile-category-button"
-            :class="{
-              'mobile-category-button--active': 
-                (category.slug === 'all' && selectedCategory === '') ||
-                (category.slug === selectedCategory)
-            }"
-          >
-            <span class="category-name">{{ category.name }}</span>
-            <span v-if="category.count > 0" class="category-count">
-              {{ category.count }}
-            </span>
-          </button>
-        </div>
-        
-        <div v-if="hasActiveFilters" class="mobile-filters-actions">
-          <button @click="clearAllFilters" class="mobile-clear-button">
-            {{ t('blog.filters.clearAll') }}
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Overlay para móvil -->
-    <div 
-      v-if="showMobileFilters"
-      class="mobile-filters-overlay"
-      @click="toggleMobileFilters"
-    ></div>
+
   </div>
 </template>
 
@@ -467,162 +402,9 @@ const toggleMobileFilters = () => {
   }
 }
 
-// Panel móvil
-.mobile-filters-panel {
-  position: fixed;
-  top: 0;
-  right: -100%;
-  width: 300px;
-  height: 100vh;
-  background: rgba(26, 26, 46, 0.98);
-  backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 1000;
-  transition: right 0.3s ease;
-  
-  &--open {
-    right: 0;
-  }
-}
 
-.mobile-filters-content {
-  padding: 2rem 1.5rem;
-  height: 100%;
-  overflow-y: auto;
-}
-
-.mobile-filters-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  
-  h3 {
-    color: white;
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-  }
-}
-
-.mobile-filters-close {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-  
-  &:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.1);
-  }
-}
-
-.mobile-categories {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-}
-
-.mobile-category-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: left;
-  width: 100%;
-  
-  .category-name {
-    text-transform: capitalize;
-    font-weight: 500;
-  }
-  
-  .category-count {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-    color: white;
-  }
-  
-  &--active {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    border-color: transparent;
-    color: white;
-    
-    .category-count {
-      background: rgba(255, 255, 255, 0.2);
-    }
-  }
-}
-
-.mobile-filters-actions {
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mobile-clear-button {
-  width: 100%;
-  padding: 1rem;
-  background: rgba(255, 107, 107, 0.1);
-  border: 2px solid rgba(255, 107, 107, 0.2);
-  border-radius: 12px;
-  color: #ff6b6b;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  
-  &:hover {
-    background: rgba(255, 107, 107, 0.2);
-    border-color: rgba(255, 107, 107, 0.4);
-  }
-}
-
-.mobile-filters-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
 
 // Responsive Design
-@media (max-width: 1024px) {
-  .blog-filters {
-    &__categories {
-      .categories-container {
-        display: none;
-      }
-    }
-  }
-  
-  .mobile-filters-toggle {
-    display: flex;
-  }
-}
-
 @media (max-width: 768px) {
   .blog-filters {
     &__main {
@@ -631,6 +413,11 @@ const toggleMobileFilters = () => {
     
     &__categories {
       padding: 0 1rem;
+      
+      .categories-container {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
     }
   }
   
@@ -638,18 +425,32 @@ const toggleMobileFilters = () => {
     max-width: none;
   }
   
-  .mobile-filters-panel {
-    width: 280px;
+  .category-button {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .mobile-filters-toggle {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
-  .mobile-filters-panel {
-    width: 100%;
-    right: -100%;
+  .blog-filters {
+    &__categories {
+      .categories-container {
+        gap: 0.375rem;
+      }
+    }
+  }
+  
+  .category-button {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
     
-    &--open {
-      right: 0;
+    .category-count {
+      font-size: 0.65rem;
+      padding: 0.125rem 0.25rem;
     }
   }
 }

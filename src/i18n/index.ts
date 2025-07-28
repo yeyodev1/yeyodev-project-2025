@@ -118,11 +118,15 @@ const es = {
       scrollDown: 'Scroll para explorar',
     },
     filters: {
+      allCategories: 'Todas las categorías',
+      searchPlaceholder: 'Buscar artículos...',
+      clearSearch: 'Limpiar búsqueda',
+      toggleView: 'Cambiar vista',
+      filters: 'Filtros',
+      categories: 'Categorías',
+      clearAll: 'Limpiar todo',
       search: {
         placeholder: 'Buscar artículos...',
-      },
-      categories: {
-        all: 'Todas las categorías',
       },
       viewMode: {
         grid: 'Vista en cuadrícula',
@@ -304,11 +308,15 @@ const en = {
       scrollDown: 'Scroll to explore',
     },
     filters: {
+      allCategories: 'All Categories',
+      searchPlaceholder: 'Search articles...',
+      clearSearch: 'Clear search',
+      toggleView: 'Toggle view',
+      filters: 'Filters',
+      categories: 'Categories',
+      clearAll: 'Clear all',
       search: {
         placeholder: 'Search articles...',
-      },
-      categories: {
-        all: 'All categories',
       },
       viewMode: {
         grid: 'Grid view',
