@@ -52,7 +52,7 @@ const projects = ref([
     title: 'API RESTful Segura',
     category: 'Backend',
     description: 'API robusta con autenticación JWT, rate limiting y documentación completa',
-    technologies: ['Node.js', 'Express', 'PostgreSQL', 'JWT'],
+    technologies: ['Node.js', 'Express', 'SheetsDB', 'JWT'],
     imageUrl: 'https://placehold.co/600x400/22223b/ffffff?text=API+REST',
     projectUrl: '#',
     featured: false,
@@ -257,6 +257,7 @@ onMounted(() => {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -264,8 +265,15 @@ onMounted(() => {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 // Sección principal
@@ -273,14 +281,13 @@ onMounted(() => {
   position: relative;
   min-height: 100vh;
   padding: 120px 0;
-  background: linear-gradient(135deg, 
-    $YEYO-VIOLET 0%, 
-    rgba(26, 26, 46, 0.95) 20%, 
-    rgba(22, 33, 62, 0.9) 40%, 
-    rgba(15, 52, 96, 0.85) 60%, 
-    rgba(34, 34, 59, 0.8) 80%, 
-    rgba(34, 34, 59, 0.8) 100%
-  );
+  background: linear-gradient(135deg,
+      $YEYO-VIOLET 0%,
+      rgba(26, 26, 46, 0.95) 20%,
+      rgba(22, 33, 62, 0.9) 40%,
+      rgba(15, 52, 96, 0.85) 60%,
+      rgba(34, 34, 59, 0.8) 80%,
+      rgba(34, 34, 59, 0.8) 100%);
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
   overflow: hidden;
@@ -494,11 +501,11 @@ onMounted(() => {
     &:hover {
       border-color: rgba(79, 172, 254, 0.3);
       transform: translateY(-5px);
-      
+
       .projects__card-image img {
         transform: scale(1.05);
       }
-      
+
       .projects__card-overlay {
         opacity: 1;
       }
@@ -509,7 +516,7 @@ onMounted(() => {
     position: relative;
     height: 250px;
     overflow: hidden;
-    
+
     img {
       width: 100%;
       height: 100%;
@@ -524,11 +531,9 @@ onMounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(34, 34, 59, 0.1) 0%,
-      rgba(34, 34, 59, 0.8) 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(34, 34, 59, 0.1) 0%,
+        rgba(34, 34, 59, 0.8) 100%);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -544,13 +549,13 @@ onMounted(() => {
     border-radius: 15px;
     font-size: 0.8rem;
     font-weight: 600;
-    
+
     &--completado {
       background: rgba(79, 172, 254, 0.2);
       color: #4facfe;
       border: 1px solid rgba(79, 172, 254, 0.3);
     }
-    
+
     &--en-desarrollo {
       background: rgba(255, 107, 107, 0.2);
       color: #ff6b6b;
@@ -574,7 +579,7 @@ onMounted(() => {
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
-    
+
     &:hover {
       background: rgba(79, 172, 254, 0.2);
       border-color: rgba(79, 172, 254, 0.4);
@@ -636,7 +641,7 @@ onMounted(() => {
     font-size: 0.8rem;
     font-weight: 500;
     transition: all 0.3s ease;
-    
+
     &:hover {
       background: rgba(79, 172, 254, 0.1);
       border-color: rgba(79, 172, 254, 0.3);
@@ -696,6 +701,7 @@ onMounted(() => {
 
   // Estados de visibilidad
   &--visible {
+
     .projects__header,
     .projects__filters,
     .projects__cta {
@@ -735,26 +741,26 @@ onMounted(() => {
 @media (max-width: 768px) {
   .projects {
     padding: 60px 0;
-    
+
     &__container {
       padding: 0 15px;
     }
-    
+
     &__title {
       font-size: clamp(2rem, 6vw, 3rem);
     }
-    
+
     &__grid {
       grid-template-columns: 1fr;
       gap: 20px;
       margin-bottom: 60px;
     }
-    
+
     &__stats {
       grid-template-columns: repeat(2, 1fr);
       gap: 15px;
     }
-    
+
     &__filters {
       gap: 10px;
       margin-bottom: 40px;
@@ -769,7 +775,7 @@ onMounted(() => {
 @media (max-width: 480px) {
   .projects {
     padding: 40px 0;
-    
+
     &__container {
       padding: 0 10px;
     }
@@ -778,7 +784,7 @@ onMounted(() => {
       grid-template-columns: 1fr;
       gap: 10px;
     }
-    
+
     &__filters {
       flex-direction: column;
       align-items: center;

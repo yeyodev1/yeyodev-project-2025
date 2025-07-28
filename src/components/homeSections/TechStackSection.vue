@@ -24,7 +24,7 @@ const techCategories = [
       { name: 'Node.js', level: 85, description: 'Runtime de JavaScript en servidor' },
       { name: 'Express', level: 80, description: 'Framework web para Node.js' },
       { name: 'MongoDB', level: 75, description: 'Base de datos NoSQL' },
-      { name: 'PostgreSQL', level: 70, description: 'Base de datos relacional' }
+      { name: 'SheetsDB', level: 70, description: 'Base de datos en hojas de cálculo' }
     ]
   },
   {
@@ -76,9 +76,9 @@ onMounted(() => {
           v-for="(category, categoryIndex) in techCategories" 
           :key="category.name"
           class="stack__category"
-          :style="{ 
+          :style="{
             '--category-color': category.color,
-            '--category-delay': categoryIndex 
+            '--category-delay': categoryIndex
           }"
         >
           <div class="stack__category-header">
@@ -91,7 +91,7 @@ onMounted(() => {
               v-for="(skill, skillIndex) in category.skills" 
               :key="skill.name"
               class="stack__skill"
-              :style="{ 
+              :style="{
                 '--skill-delay': skillIndex,
                 '--skill-level': skill.level + '%'
               }"
@@ -130,6 +130,7 @@ onMounted(() => {
     opacity: 0;
     transform: translateY(50px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -141,6 +142,7 @@ onMounted(() => {
     opacity: 0;
     transform: translateX(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -151,15 +153,19 @@ onMounted(() => {
   from {
     width: 0;
   }
+
   to {
     width: var(--skill-level);
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
@@ -169,26 +175,33 @@ onMounted(() => {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .stack {
   padding: 8rem 1.5rem;
-  background: linear-gradient(135deg, 
-    $YEYO-VIOLET 0%, 
-    rgba(26, 26, 46, 0.95) 20%, 
-    rgba(22, 33, 62, 0.9) 40%, 
-    rgba(15, 52, 96, 0.85) 60%, 
-    rgba(34, 34, 59, 0.8) 80%, 
-    rgba(34, 34, 59, 0.8) 100%
-  );
+  background: linear-gradient(135deg,
+      $YEYO-VIOLET 0%,
+      rgba(26, 26, 46, 0.95) 20%,
+      rgba(22, 33, 62, 0.9) 40%,
+      rgba(15, 52, 96, 0.85) 60%,
+      rgba(34, 34, 59, 0.8) 80%,
+      rgba(34, 34, 59, 0.8) 100%);
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
   position: relative;
@@ -257,7 +270,7 @@ onMounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -275,7 +288,7 @@ onMounted(() => {
   &:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    
+
     &::before {
       opacity: 0.1;
     }
@@ -317,7 +330,7 @@ onMounted(() => {
 .stack__skill {
   opacity: 0;
   position: relative;
-  
+
   .stack.is-visible & {
     animation: skill-slide-in 0.6s ease-out forwards;
     animation-delay: calc(var(--category-delay) * 200ms + var(--skill-delay) * 100ms + 300ms);
@@ -332,7 +345,7 @@ onMounted(() => {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.12);
     transform: translateX(4px);
@@ -378,12 +391,12 @@ onMounted(() => {
   border-radius: 3px;
   width: 0;
   position: relative;
-  
+
   .stack.is-visible & {
     animation: progress-fill 1.5s ease-out forwards;
     animation-delay: calc(var(--category-delay) * 200ms + var(--skill-delay) * 100ms + 800ms);
   }
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -412,7 +425,7 @@ onMounted(() => {
   transition: all 0.3s ease;
   z-index: 10;
   backdrop-filter: blur(10px);
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -422,7 +435,7 @@ onMounted(() => {
     border: 6px solid transparent;
     border-top-color: rgba(34, 34, 59, 0.95);
   }
-  
+
   &.is-visible {
     opacity: 1;
     visibility: visible;
@@ -445,7 +458,7 @@ onMounted(() => {
   border-radius: 50%;
   background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.05));
   animation: float 6s ease-in-out infinite;
-  
+
   &--1 {
     width: 200px;
     height: 200px;
@@ -453,7 +466,7 @@ onMounted(() => {
     left: 5%;
     animation-delay: 0s;
   }
-  
+
   &--2 {
     width: 150px;
     height: 150px;
@@ -461,7 +474,7 @@ onMounted(() => {
     right: 10%;
     animation-delay: 2s;
   }
-  
+
   &--3 {
     width: 100px;
     height: 100px;
@@ -475,15 +488,15 @@ onMounted(() => {
   .stack {
     padding: 4rem 1rem;
   }
-  
+
   .stack__category {
     padding: 2rem;
   }
-  
+
   .stack__skill-content {
     padding: 1.25rem;
   }
-  
+
   .stack__skill-tooltip {
     position: fixed;
     bottom: 20px;
@@ -492,7 +505,7 @@ onMounted(() => {
     transform: none;
     white-space: normal;
     text-align: center;
-    
+
     &::after {
       display: none;
     }
