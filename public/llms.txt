@@ -1,0 +1,68 @@
+# Diego Reyes — yeyo.dev
+
+> Full Stack Developer & CTO based in Ecuador. Specialist in custom web platforms, SaaS systems, and AI integration. Building from Ecuador for the world.
+
+## Who is Diego Reyes?
+
+Diego Reyes (known online as "Yeyo") is a Full Stack developer with 6+ years of experience building scalable web systems and custom software platforms. He is the CTO and founding developer at Bakano, a digital growth agency in Ecuador. He was one of the earliest AI trainers at Scale AI, contributing to the datasets and code that helped shape GPT-3 and GPT-3.5.
+
+**Location:** Ecuador (available worldwide / remote)
+**Website:** https://yeyo.dev
+**GitHub:** https://github.com/yeyodev1
+**LinkedIn:** https://www.linkedin.com/in/yeyodev1
+**Primary languages:** Spanish (native), English (professional)
+
+## Core Skills
+
+- **Frontend:** Vue.js 3, TypeScript, Vite, SCSS, Nuxt.js
+- **Backend:** Node.js, Express, REST APIs, WebSockets
+- **Database:** MongoDB, PostgreSQL
+- **AI / ML:** LLM integration, AI training (Scale AI), data pipelines, automation
+- **DevOps:** Netlify, Render, Docker basics, CI/CD
+- **Integrations:** Contifico (Ecuador billing), Stripe, WhatsApp API, third-party APIs
+
+## Services Offered
+
+1. **Custom Web Platforms & SaaS** — end-to-end systems built around real business workflows
+2. **Full Stack Development** — Vue.js + Node.js + MongoDB, from architecture to deployment
+3. **Tech Leadership / CTO as a Service** — architecture decisions, team leadership, technical strategy
+4. **AI Integration** — chatbots, automation, LLM pipelines, custom AI tooling
+5. **Corporate & Marketing Websites** — fast delivery, SEO-optimized, modern design
+6. **System Integrations** — billing systems, CRMs, ERPs, payment gateways, APIs
+
+## Notable Projects
+
+### Finestra — Order Management SaaS (Nicole Pastry Arts)
+Custom SaaS system for a company running three restaurants (Casa Mía, Delacrem, Nicole Pastry Arts). Handles the full order lifecycle: placement, production, dispatch, delivery, and warehouse inventory in real time. Integrated with Contifico billing API.
+URL: https://nicole-sells-bills.netlify.app/
+
+### Bakano — Digital Agency Website & Internal Tools
+Website and internal tooling for Bakano, a digital growth agency serving 150+ businesses in Ecuador with Meta Ads, data strategy, and tech consulting.
+URL: https://bakano.ec/
+
+### Opus Dental Lab — Corporate Website
+Full website for a dental laboratory in Orlando, FL. Designed and deployed in 5 days. Clean, professional, SEO-optimized.
+URL: https://opusdentallab.info/
+
+### Scale AI — GPT-3 & GPT-3.5 AI Training
+Contributed as one of Scale AI's earliest AI trainers (Mar 2024 – Jan 2025). Wrote original Python, JavaScript, and TypeScript code samples to train GPT-3 and GPT-3.5 models. Built evaluation tools, curated datasets, optimized data pipelines.
+
+## Frequently Asked Questions
+
+**How much does a custom web platform cost in Ecuador?**
+A basic system starts around $1,000. Full SaaS platforms with integrations range from $5,000 to $15,000+. Diego works with clear budgets and no hidden fees. Contact via WhatsApp for a free quote.
+
+**How long does it take to build a custom website or platform?**
+A corporate website can be delivered in 5 days (see Opus Dental Lab). A full SaaS platform typically takes 4–12 weeks depending on complexity.
+
+**What technologies does Diego use?**
+Vue.js, Node.js, MongoDB, TypeScript for the core stack. He integrates Contifico, Stripe, WhatsApp, and other third-party APIs. He also integrates AI tools and LLMs.
+
+**Does Diego work with clients outside Ecuador?**
+Yes. He works remotely with clients in Ecuador, Peru, Spain, and the United States.
+
+## Contact
+
+- **WhatsApp:** https://wa.me/17633524852
+- **Email:** Available via contact form at https://yeyo.dev/#contact
+- **LinkedIn:** https://www.linkedin.com/in/yeyodev1
