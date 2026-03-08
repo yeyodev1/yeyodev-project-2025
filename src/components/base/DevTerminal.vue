@@ -1,666 +1,578 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue';
-import { useLanguage } from '@/composables/useLanguage';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 
-interface TerminalLine {
-  type: 'command' | 'output' | 'error' | 'info';
-  content: string;
-  timestamp?: string;
+interface Line {
+  type: 'cmd' | 'out' | 'err' | 'success' | 'accent' | 'dim' | 'blank'
+  text: string
 }
 
-const { t } = useLanguage();
+const isOpen      = ref(false)
+const input       = ref('')
+const lines       = ref<Line[]>([])
+const bodyRef     = ref<HTMLElement | null>(null)
+const inputRef    = ref<HTMLInputElement | null>(null)
+const isTyping    = ref(false)
 
-const isOpen = ref(false);
-const currentCommand = ref('');
-const terminalLines = ref<TerminalLine[]>([]);
-const terminalContent = ref<HTMLElement | null>(null);
-const commandInput = ref<HTMLInputElement | null>(null);
-const isTyping = ref(false);
+// ── Command history ──────────────────────────────────────────────────────────
+const history     = ref<string[]>([])
+const histIdx     = ref(-1)
 
-// Comandos disponibles y sus respuestas
-const commands = computed(() => ({
+// ── Commands registry ────────────────────────────────────────────────────────
+const COMMANDS: Record<string, { hint: string; run: () => Line[] }> = {
   help: {
-    description: t('terminal.commands.help.description'),
-    output: [
-      t('terminal.commands.help.title'),
-      '',
-      t('terminal.commands.help.about'),
-      t('terminal.commands.help.skills'),
-      t('terminal.commands.help.projects'),
-      t('terminal.commands.help.experience'),
-      t('terminal.commands.help.contact'),
-      t('terminal.commands.help.achievements'),
-      t('terminal.commands.help.techStack'),
-      t('terminal.commands.help.clear'),
-      t('terminal.commands.help.exit'),
-      '',
-      t('terminal.commands.help.tip')
-    ]
+    hint: 'list available commands',
+    run: () => [
+      { type: 'accent', text: '  Available commands' },
+      { type: 'dim',    text: '  ─────────────────────────────────────────' },
+      { type: 'out',    text: '  whoami        — who is this guy?' },
+      { type: 'out',    text: '  skills        — tech stack & proficiency' },
+      { type: 'out',    text: '  experience    — professional timeline' },
+      { type: 'out',    text: '  projects      — featured work' },
+      { type: 'out',    text: '  contact       — get in touch' },
+      { type: 'out',    text: '  achievements  — stats & highlights' },
+      { type: 'out',    text: '  git log       — commit history (fun version)' },
+      { type: 'out',    text: '  sudo hire me  — make a great decision' },
+      { type: 'out',    text: '  clear         — clear terminal' },
+      { type: 'out',    text: '  exit          — close terminal' },
+      { type: 'blank',  text: '' },
+      { type: 'dim',    text: '  ↑ ↓  navigate history  |  Tab  autocomplete' },
+    ],
   },
-  about: {
-    description: 'Información personal',
-    output: [
-      '👨‍💻 Diego Reyes - Full Stack Developer',
-      '',
-      'Desarrollador apasionado por la arquitectura de software',
-      'y la creación de experiencias de usuario memorables.',
-      '',
-      'Especializado en:',
-      '• Desarrollo Frontend con Vue.js y TypeScript',
-      '• Arquitectura de aplicaciones escalables',
-      '• Clean Code y mejores prácticas',
-      '• Optimización de performance',
-      '',
-      'Ubicación: México 🇲🇽',
-      'Años de experiencia: 3+'
-    ]
+
+  whoami: {
+    hint: 'who is this guy?',
+    run: () => [
+      { type: 'accent',  text: '  Diego Reyes  ·  aka Yeyo' },
+      { type: 'dim',     text: '  ─────────────────────────────────────────' },
+      { type: 'out',     text: '  Role      : CTO @ Bakano · Full Stack Dev · AI Trainer' },
+      { type: 'out',     text: '  Location  : Ecuador (EC) — available worldwide' },
+      { type: 'out',     text: '  Experience: 6+ years building production systems' },
+      { type: 'blank',   text: '' },
+      { type: 'out',     text: '  I read businesses like code —' },
+      { type: 'out',     text: '  walk in, observe the team, and map the entire' },
+      { type: 'out',     text: '  system in my head before writing line one.' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Scale AI  : Early AI trainer · GPT-3 & GPT-3.5 datasets' },
+      { type: 'success', text: '  Bakano    : Built & lead the tech team from day 1' },
+      { type: 'success', text: '  Finestra  : SaaS for pastry studios — prod since 2024' },
+    ],
   },
+
   skills: {
-    description: 'Tecnologías y habilidades',
-    output: [
-      '🛠️  STACK TECNOLÓGICO',
-      '',
-      'Frontend:',
-      '├── Vue.js 3 (Composition API) ████████████ 95%',
-      '├── TypeScript              ████████████ 90%',
-      '├── JavaScript (ES6+)       ████████████ 95%',
-      '├── HTML5 & CSS3            ████████████ 98%',
-      '├── SCSS/Sass               ████████████ 90%',
-      '└── Responsive Design       ████████████ 95%',
-      '',
-      'Tools & Others:',
-      '├── Git & GitHub            ████████████ 90%',
-      '├── Vite                    ████████████ 85%',
-      '├── Node.js                 ████████████ 80%',
-      '├── REST APIs               ████████████ 85%',
-      '└── Testing (Vitest)        ████████████ 75%'
-    ]
+    hint: 'tech stack & proficiency',
+    run: () => [
+      { type: 'accent', text: '  Tech Stack' },
+      { type: 'dim',    text: '  ─────────────────────────────────────────' },
+      { type: 'out',    text: '  Vue 3 / Nuxt      ██████████████████  98%' },
+      { type: 'out',    text: '  TypeScript        █████████████████░  92%' },
+      { type: 'out',    text: '  Node.js / Express ████████████████░░  88%' },
+      { type: 'out',    text: '  PostgreSQL / SQL  ███████████████░░░  82%' },
+      { type: 'out',    text: '  Python            ██████████████░░░░  78%' },
+      { type: 'out',    text: '  Docker / CI-CD    █████████████░░░░░  74%' },
+      { type: 'blank',  text: '' },
+      { type: 'accent', text: '  Also fluent in' },
+      { type: 'out',    text: '  SCSS · Tailwind · Vite · Pinia · REST · WebSockets' },
+      { type: 'out',    text: '  Spline · Three.js · Figma → code workflows' },
+    ],
   },
-  projects: {
-    description: 'Proyectos destacados',
-    output: [
-      '🚀 PROYECTOS DESTACADOS',
-      '',
-      '1. Portfolio Personal',
-      '   ├── Tecnologías: Vue 3, TypeScript, SCSS',
-      '   ├── Características: Responsive, Animaciones, PWA',
-      '   └── Estado: ✅ Completado',
-      '',
-      '2. Sistema de Gestión Empresarial',
-      '   ├── Tecnologías: Vue 3, Pinia, TypeScript',
-      '   ├── Características: Dashboard, CRUD, Reportes',
-      '   └── Estado: ✅ En producción',
-      '',
-      '3. E-commerce Platform',
-      '   ├── Tecnologías: Vue 3, Node.js, MongoDB',
-      '   ├── Características: Carrito, Pagos, Admin Panel',
-      '   └── Estado: 🔄 En desarrollo',
-      '',
-      'Total de proyectos completados: 50+'
-    ]
-  },
+
   experience: {
-    description: 'Experiencia profesional',
-    output: [
-      '💼 EXPERIENCIA PROFESIONAL',
-      '',
-      '2021 - Presente | Full Stack Developer',
-      '├── Desarrollo de aplicaciones web escalables',
-      '├── Implementación de arquitecturas limpias',
-      '├── Liderazgo técnico en proyectos',
-      '└── Mentoring a desarrolladores junior',
-      '',
-      '2020 - 2021 | Frontend Developer',
-      '├── Desarrollo de interfaces de usuario',
-      '├── Optimización de performance',
-      '├── Implementación de diseños responsive',
-      '└── Colaboración con equipos de diseño',
-      '',
-      'Metodologías: Agile, Scrum, Kanban',
-      'Soft Skills: Liderazgo, Comunicación, Resolución de problemas'
-    ]
+    hint: 'professional timeline',
+    run: () => [
+      { type: 'accent',  text: '  Professional Timeline' },
+      { type: 'dim',     text: '  ─────────────────────────────────────────' },
+      { type: 'success', text: '  2024 → now   CTO · Bakano' },
+      { type: 'out',     text: '               Built the product from zero.' },
+      { type: 'out',     text: '               Led team, architected the stack,' },
+      { type: 'out',     text: '               delivered in 3 days.' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  2024 → now   Finestra SaaS' },
+      { type: 'out',     text: '               Order mgmt → production → dispatch' },
+      { type: 'out',     text: '               → delivery → warehouse. Contifico billing.' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  2023 → 2025  AI Trainer · Scale AI' },
+      { type: 'out',     text: '               One of the first teams. Wrote Python,' },
+      { type: 'out',     text: '               JS & TS code to shape GPT-3 / GPT-3.5.' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  2024         Opus Dental Lab' },
+      { type: 'out',     text: '               Full dental-lab management app.' },
+      { type: 'out',     text: '               Design → production in 5 days.' },
+      { type: 'blank',   text: '' },
+      { type: 'dim',     text: '  3 402 commits  ·  4 countries  ·  15+ projects' },
+    ],
   },
+
+  projects: {
+    hint: 'featured work',
+    run: () => [
+      { type: 'accent',  text: '  Featured Projects' },
+      { type: 'dim',     text: '  ─────────────────────────────────────────' },
+      { type: 'success', text: '  Finestra — Pastry Studio SaaS' },
+      { type: 'out',     text: '  Vue 3 · Node · PostgreSQL · Contifico' },
+      { type: 'out',     text: '  Full order lifecycle in production' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Bakano — Digital Agency Platform' },
+      { type: 'out',     text: '  Vue 3 · TypeScript · Vite · SCSS' },
+      { type: 'out',     text: '  Shipped in 3 days as CTO' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Opus Dental Lab — Lab Management' },
+      { type: 'out',     text: '  Full workflow: orders → production → delivery' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Scale AI — GPT Training Datasets' },
+      { type: 'out',     text: '  Python · TypeScript · original code, no copy-paste' },
+    ],
+  },
+
   contact: {
-    description: 'Información de contacto',
-    output: [
-      '📧 INFORMACIÓN DE CONTACTO',
-      '',
-      'Email: diego@yeyodev.com',
-      'GitHub: https://github.com/yeyodev1',
-      'LinkedIn: https://linkedin.com/in/yeyodev1',
-      'Portfolio: https://yeyodev.com',
-      '',
-      '🌍 Disponible para:',
-      '• Proyectos freelance',
-      '• Colaboraciones',
-      '• Oportunidades laborales',
-      '• Consultoría técnica',
-      '',
-      'Horario: Lun-Vie 9:00-18:00 (GMT-6)'
-    ]
+    hint: 'get in touch',
+    run: () => [
+      { type: 'accent',  text: '  Let\'s build something' },
+      { type: 'dim',     text: '  ─────────────────────────────────────────' },
+      { type: 'out',     text: '  WhatsApp  : +1 (763) 352-4852' },
+      { type: 'out',     text: '  Email     : diego@yeyo.dev' },
+      { type: 'out',     text: '  GitHub    : github.com/yeyodev1' },
+      { type: 'out',     text: '  LinkedIn  : linkedin.com/in/yeyodev' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Ecuador 🇪🇨 · respond within a few hours' },
+      { type: 'out',     text: '  Available for projects · consulting · full-time' },
+    ],
   },
+
   achievements: {
-    description: 'Logros y estadísticas',
-    output: [
-      '🏆 LOGROS Y ESTADÍSTICAS',
-      '',
-      'Proyectos completados:     50+',
-      'Años de experiencia:       3+',
-      'Tecnologías dominadas:     15+',
-      'Líneas de código:          100,000+',
-      'Commits en GitHub:         1,500+',
-      'Bugs resueltos:            500+',
-      'Cafés consumidos:          ∞',
-      '',
-      '📈 Métricas de calidad:',
-      '├── Code coverage:         85%+',
-      '├── Performance score:     95%+',
-      '├── Accessibility:         98%+',
-      '└── SEO score:             100%'
-    ]
+    hint: 'stats & highlights',
+    run: () => [
+      { type: 'accent',  text: '  Stats' },
+      { type: 'dim',     text: '  ─────────────────────────────────────────' },
+      { type: 'out',     text: '  Commits        3 402' },
+      { type: 'out',     text: '  Years exp       6+' },
+      { type: 'out',     text: '  Countries        4  (EC · MX · US · remote)' },
+      { type: 'out',     text: '  Projects        15+' },
+      { type: 'out',     text: '  Coffees          ∞' },
+      { type: 'blank',   text: '' },
+      { type: 'accent',  text: '  Highlights' },
+      { type: 'success', text: '  [+]  One of first AI trainers on GPT-3 team' },
+      { type: 'success', text: '  [+]  CTO & product built in 3 days' },
+      { type: 'success', text: '  [+]  SaaS in production serving real businesses' },
+      { type: 'success', text: '  [+]  Maps entire business systems by observation' },
+    ],
   },
-  'tech-stack': {
-    description: 'Stack tecnológico actual',
-    output: [
-      '⚡ STACK TECNOLÓGICO ACTUAL',
-      '',
-      'Frontend Framework:',
-      '└── Vue.js 3 (Composition API + <script setup>)',
-      '',
-      'Lenguajes:',
-      '├── TypeScript (Tipado estricto)',
-      '├── JavaScript ES2022+',
-      '└── HTML5 & CSS3',
-      '',
-      'Preprocesadores:',
-      '└── SCSS con arquitectura modular',
-      '',
-      'Build Tools:',
-      '├── Vite (Ultra-fast HMR)',
-      '└── ESLint + Prettier',
-      '',
-      'Testing:',
-      '├── Vitest (Unit testing)',
-      '└── Cypress (E2E testing)',
-      '',
-      'Deployment:',
-      '└── Netlify con CI/CD automático'
-    ]
+
+  'git log': {
+    hint: 'commit history',
+    run: () => [
+      { type: 'accent', text: '  git log --oneline --graph' },
+      { type: 'dim',    text: '  ─────────────────────────────────────────' },
+      { type: 'success',text: '  * a1b2c3  feat: ship portfolio v3 — Spline robot + timeline' },
+      { type: 'out',    text: '  * d4e5f6  feat: CTO mode activated @ Bakano' },
+      { type: 'out',    text: '  * 7g8h9i  feat: add Scale AI GPT-3.5 training dataset' },
+      { type: 'out',    text: '  * j0k1l2  feat: Finestra SaaS goes live in production' },
+      { type: 'out',    text: '  * m3n4o5  feat: Opus Dental Lab — design to prod in 5d' },
+      { type: 'out',    text: '  * p6q7r8  fix: business logic — read 3 companies by lunch' },
+      { type: 'out',    text: '  * s9t0u1  chore: relocate Ecuador -> world stage' },
+      { type: 'dim',    text: '' },
+      { type: 'dim',    text: '  3 402 commits and counting...' },
+    ],
+  },
+
+  'sudo hire me': {
+    hint: '',
+    run: () => [
+      { type: 'dim',     text: '  [sudo] password for recruiter:  ........' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Access granted.' },
+      { type: 'blank',   text: '' },
+      { type: 'accent',  text: '  Executing: hire --candidate="Diego Reyes" --level=senior' },
+      { type: 'blank',   text: '' },
+      { type: 'out',     text: '  Checking availability ............. OPEN' },
+      { type: 'out',     text: '  Checking skills ................... EXCEPTIONAL' },
+      { type: 'out',     text: '  Checking business instinct ........ OFF THE CHARTS' },
+      { type: 'out',     text: '  Checking team impact .............. HIGH' },
+      { type: 'blank',   text: '' },
+      { type: 'success', text: '  Result: Best decision you\'ll make this quarter.' },
+      { type: 'dim',     text: '  -> WhatsApp: +1 (763) 352-4852' },
+    ],
+  },
+}
+
+const ALL_CMDS = Object.keys(COMMANDS)
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const scrollBottom = () => nextTick(() => {
+  if (bodyRef.value) bodyRef.value.scrollTop = bodyRef.value.scrollHeight
+})
+
+const push = (l: Line) => { lines.value.push(l); scrollBottom() }
+
+const typeLines = async (ls: Line[], delay = 12) => {
+  isTyping.value = true
+  for (const l of ls) {
+    push(l)
+    await new Promise(r => setTimeout(r, l.type === 'blank' ? 0 : delay))
   }
-}));
+  isTyping.value = false
+}
 
-const addLine = (type: TerminalLine['type'], content: string) => {
-  const timestamp = new Date().toLocaleTimeString('es-ES', {
-    hour12: false,
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
+// ── Command execution ────────────────────────────────────────────────────────
+const run = async (raw: string) => {
+  const cmd = raw.trim().toLowerCase()
+  push({ type: 'cmd', text: `yeyo@portfolio:~$ ${raw.trim()}` })
 
-  terminalLines.value.push({
-    type,
-    content,
-    timestamp
-  });
+  if (!cmd) return
 
-  nextTick(() => {
-    if (terminalContent.value) {
-      terminalContent.value.scrollTop = terminalContent.value.scrollHeight;
-    }
-  });
-};
+  if (cmd === 'clear') { lines.value = []; return }
+  if (cmd === 'exit')  { isOpen.value = false; return }
 
-const typeWriter = async (lines: string[], delay = 15) => {
-  isTyping.value = true;
-
-  for (const line of lines) {
-    let currentText = '';
-    for (const char of line) {
-      currentText += char;
-      // Simular typing effect
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
-    addLine('output', line);
-    await new Promise(resolve => setTimeout(resolve, 30));
-  }
-
-  isTyping.value = false;
-};
-
-const executeCommand = async (cmd: string) => {
-  const trimmedCmd = cmd.trim().toLowerCase();
-
-  // Agregar comando a la terminal
-  addLine('command', `$ ${cmd}`);
-
-  if (!trimmedCmd) return;
-
-  if (trimmedCmd === 'clear') {
-    terminalLines.value = [];
-    return;
-  }
-
-  if (trimmedCmd === 'exit') {
-    isOpen.value = false;
-    return;
-  }
-
-  const command = commands.value[trimmedCmd as keyof typeof commands.value];
-
-  if (command) {
-    await typeWriter(command.output, 10);
+  const def = COMMANDS[cmd]
+  if (def) {
+    await typeLines(def.run())
   } else {
-    addLine('error', `Comando no encontrado: ${trimmedCmd}`);
-    addLine('info', 'Escribe "help" para ver los comandos disponibles');
+    push({ type: 'err',  text: `  command not found: ${cmd}` })
+    push({ type: 'dim',  text: '  type "help" for available commands' })
   }
-};
+  push({ type: 'blank', text: '' })
+}
 
-const handleKeyPress = (event: KeyboardEvent) => {
-  if (event.key === 'Enter' && !isTyping.value) {
-    executeCommand(currentCommand.value);
-    currentCommand.value = '';
-  }
-};
-
-const openTerminal = () => {
-  isOpen.value = true;
-
-  if (terminalLines.value.length === 0) {
-    // Mensaje de bienvenida
-    setTimeout(() => {
-      addLine('info', '🚀 Terminal de Diego Reyes - Portfolio Interactivo');
-      addLine('info', 'Escribe "help" para ver los comandos disponibles');
-      addLine('info', '');
-    }, 500);
+// ── Input handling ───────────────────────────────────────────────────────────
+const onKeydown = async (e: KeyboardEvent) => {
+  if (e.key === 'Enter' && !isTyping.value) {
+    const val = input.value
+    if (val.trim()) { history.value.unshift(val); histIdx.value = -1 }
+    input.value = ''
+    await run(val)
+    return
   }
 
-  nextTick(() => {
-    if (commandInput.value) {
-      commandInput.value.focus();
-    }
-  });
-};
-
-const closeTerminal = () => {
-  isOpen.value = false;
-};
-
-// Auto-focus en el input cuando se abre la terminal
-const handleTerminalClick = () => {
-  if (commandInput.value && !isTyping.value) {
-    commandInput.value.focus();
+  if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    histIdx.value = Math.min(histIdx.value + 1, history.value.length - 1)
+    input.value = history.value[histIdx.value] ?? ''
+    return
   }
-};
 
-// Detectar si es desktop usando media query
-const isDesktop = ref(false);
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    histIdx.value = Math.max(histIdx.value - 1, -1)
+    input.value = histIdx.value >= 0 ? (history.value[histIdx.value] ?? '') : ''
+    return
+  }
 
-onMounted(() => {
-  // Verificar si es desktop
-  const checkIsDesktop = () => {
-    isDesktop.value = window.innerWidth >= 1024;
-  };
+  if (e.key === 'Tab') {
+    e.preventDefault()
+    const partial = input.value.toLowerCase()
+    const match   = ALL_CMDS.find(c => c.startsWith(partial) && c !== partial)
+    if (match) input.value = match
+    return
+  }
+}
 
-  checkIsDesktop();
-  window.addEventListener('resize', checkIsDesktop);
+// ── Open / close ─────────────────────────────────────────────────────────────
+const open = async () => {
+  isOpen.value = true
+  if (lines.value.length === 0) {
+    await nextTick()
+    await typeLines([
+      { type: 'accent',  text: '  yeyo.dev  —  interactive terminal  v3' },
+      { type: 'dim',     text: '  ─────────────────────────────────────────' },
+      { type: 'out',     text: '  Hey dev — you found the terminal. Nice.' },
+      { type: 'out',     text: '  Type "help" to see what you can do here.' },
+      { type: 'blank',   text: '' },
+    ], 8)
+  }
+  await nextTick()
+  inputRef.value?.focus()
+}
 
-  // Cleanup
-  return () => {
-    window.removeEventListener('resize', checkIsDesktop);
-  };
-});
+const close = () => { isOpen.value = false }
+
+// ── Keyboard shortcut: Ctrl+` ────────────────────────────────────────────────
+const onGlobalKey = (e: KeyboardEvent) => {
+  if (e.ctrlKey && e.key === '`') { isOpen.value ? close() : open() }
+}
+
+onMounted(() => document.addEventListener('keydown', onGlobalKey))
+onUnmounted(() => document.removeEventListener('keydown', onGlobalKey))
 </script>
 
 <template>
-  <!-- Botón sticky solo en desktop -->
-  <div v-if="isDesktop" class="dev-terminal">
-    <!-- Botón flotante -->
-    <Transition name="slide-up">
-      <button 
-        v-if="!isOpen"
-        @click="openTerminal"
-        class="dev-terminal__trigger"
-        title="¿Eres programador, entra aquí? Abre la terminal"
-      >
-        <span class="dev-terminal__trigger-icon">💻</span>
-        <span class="dev-terminal__trigger-text">{{ t('terminal.trigger.text') }}</span>
+  <div class="dt">
+
+    <!-- ── Trigger button ───────────────────────────────────────────────── -->
+    <Transition name="dt-pop">
+      <button v-if="!isOpen" class="dt__trigger" @click="open" aria-label="Open terminal">
+        <i class="fa-solid fa-terminal dt__trigger-icon" />
+        <span class="dt__trigger-label">Terminal</span>
+        <kbd class="dt__trigger-kbd">^`</kbd>
       </button>
     </Transition>
 
-    <!-- Terminal modal -->
-    <Transition name="terminal-slide">
-      <div v-if="isOpen" class="dev-terminal__modal">
-        <div class="dev-terminal__window">
-          <!-- Header de la terminal -->
-          <div class="dev-terminal__header">
-            <div class="dev-terminal__controls">
-              <button class="dev-terminal__control dev-terminal__control--close" @click="closeTerminal"></button>
-              <button class="dev-terminal__control dev-terminal__control--minimize"></button>
-              <button class="dev-terminal__control dev-terminal__control--maximize"></button>
+    <!-- ── Terminal window ──────────────────────────────────────────────── -->
+    <Transition name="dt-slide">
+      <div v-if="isOpen" class="dt__backdrop" @click.self="close">
+        <div class="dt__window">
+
+          <!-- Title bar -->
+          <div class="dt__bar">
+            <div class="dt__dots">
+              <button class="dt__dot dt__dot--red"    @click="close"   aria-label="close" />
+              <button class="dt__dot dt__dot--yellow" aria-label="minimize" />
+              <button class="dt__dot dt__dot--green"  aria-label="maximize" />
             </div>
-            <div class="dev-terminal__title">diego@portfolio:~$</div>
+            <span class="dt__bar-title">yeyo@portfolio — bash</span>
+            <span class="dt__bar-hint">ctrl+` to toggle</span>
           </div>
 
-          <!-- Contenido de la terminal -->
-          <div 
-            ref="terminalContent"
-            class="dev-terminal__content"
-            @click="handleTerminalClick"
-          >
-            <!-- Líneas de la terminal -->
-            <div 
-              v-for="(line, index) in terminalLines" 
-              :key="index"
-              class="dev-terminal__line"
-              :class="`dev-terminal__line--${line.type}`"
-            >
-              <span v-if="line.type === 'command'" class="dev-terminal__prompt">{{ line.content }}</span>
-              <span v-else>{{ line.content }}</span>
-            </div>
+          <!-- Output area -->
+          <div ref="bodyRef" class="dt__body" @click="inputRef?.focus()">
+            <div
+              v-for="(line, i) in lines"
+              :key="i"
+              class="dt__line"
+              :class="`dt__line--${line.type}`"
+            >{{ line.text }}</div>
 
-            <!-- Input de comando -->
-            <div class="dev-terminal__input-line">
-              <span class="dev-terminal__prompt">$ </span>
+            <!-- Active input row -->
+            <div class="dt__input-row">
+              <span class="dt__ps1">yeyo@portfolio:~$&nbsp;</span>
               <input
-                ref="commandInput"
-                v-model="currentCommand"
-                @keypress="handleKeyPress"
-                class="dev-terminal__input"
-                :placeholder="t('terminal.input.placeholder')"
-                :disabled="isTyping"
+                ref="inputRef"
+                v-model="input"
+                class="dt__input"
+                @keydown="onKeydown"
                 autocomplete="off"
                 spellcheck="false"
+                :disabled="isTyping"
+                aria-label="terminal input"
               />
-              <span v-if="isTyping" class="dev-terminal__cursor dev-terminal__cursor--typing">|</span>
-              <span v-else class="dev-terminal__cursor">|</span>
+              <span class="dt__caret" :class="{ 'dt__caret--pause': isTyping }" />
             </div>
           </div>
+
         </div>
       </div>
     </Transition>
+
   </div>
 </template>
 
 <style lang="scss" scoped>
-
-
-.dev-terminal {
+// ── Layout shell ─────────────────────────────────────────────────────────────
+.dt {
   position: fixed;
   bottom: 2rem;
   left: 2rem;
   z-index: 9999;
 
-  @media (max-width: 1023px) {
-    display: none;
-  }
+  @media (max-width: 1023px) { display: none; }
 }
 
-// Botón trigger
-.dev-terminal__trigger {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 1px solid rgba(79, 172, 254, 0.3);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+// ── Trigger ───────────────────────────────────────────────────────────────────
+.dt__trigger {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  background: rgba(4, 4, 12, 0.85);
+  border: 1px solid $border-violet;
+  border-radius: 8px;
+  color: $accent-light;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.78rem;
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.15);
+  transition: all 0.25s ease;
 
   &:hover {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(79, 172, 254, 0.4);
-    color: white;
-  }
-
-  &:active {
-    transform: translateY(0);
+    border-color: $accent-primary;
+    box-shadow: 0 4px 32px rgba(124, 58, 237, 0.35);
+    color: $text-primary;
+    .dt__trigger-bar { background: $accent-primary; }
   }
 }
 
-.dev-terminal__trigger-icon {
-  font-size: 1.25rem;
-  animation: pulse 2s ease-in-out infinite;
+.dt__trigger-icon {
+  font-size: 0.9rem;
+  color: $accent-light;
+  transition: color 0.25s;
+  .dt__trigger:hover & { color: $text-primary; }
 }
 
-.dev-terminal__trigger-text {
-  white-space: nowrap;
+.dt__trigger-label {
+  margin-left: 0.25rem;
+  letter-spacing: 0.05em;
 }
 
-// Modal de la terminal
-.dev-terminal__modal {
+.dt__trigger-kbd {
+  margin-left: 0.25rem;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid $border-violet;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: $text-muted;
+  font-family: inherit;
+}
+
+// ── Backdrop ─────────────────────────────────────────────────────────────────
+.dt__backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
+  inset: 0;
+  background: rgba(2, 2, 8, 0.75);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  z-index: 9999;
 }
 
-.dev-terminal__window {
-  background: #1a1a2e;
-  border-radius: 12px;
+// ── Window ────────────────────────────────────────────────────────────────────
+.dt__window {
   width: 100%;
-  max-width: 800px;
-  max-height: 600px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(79, 172, 254, 0.2);
+  max-width: 780px;
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  background: #06060f;
+  border: 1px solid $border-violet;
+  border-radius: 14px;
   overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(124,58,237,0.1),
+    0 32px 80px rgba(0,0,0,0.7),
+    0 0 60px rgba(124,58,237,0.12);
 }
 
-// Header de la terminal
-.dev-terminal__header {
-  background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
-  padding: 1rem 1.5rem;
+// ── Title bar ─────────────────────────────────────────────────────────────────
+.dt__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(79, 172, 254, 0.2);
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: #0d0d1f;
+  border-bottom: 1px solid $border-subtle;
+  flex-shrink: 0;
 }
 
-.dev-terminal__controls {
-  display: flex;
-  gap: 0.5rem;
-}
+.dt__dots { display: flex; gap: 0.45rem; }
 
-.dev-terminal__control {
+.dt__dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: filter 0.2s;
 
-  &--close {
-    background: #ff5f57;
+  &--red    { background: #ff5f57; }
+  &--yellow { background: #ffbd2e; }
+  &--green  { background: #28ca42; }
 
-    &:hover {
-      background: #ff3b30;
-    }
-  }
-
-  &--minimize {
-    background: #ffbd2e;
-
-    &:hover {
-      background: #ff9500;
-    }
-  }
-
-  &--maximize {
-    background: #28ca42;
-
-    &:hover {
-      background: #00c851;
-    }
-  }
+  &:hover { filter: brightness(1.25); }
 }
 
-.dev-terminal__title {
-  color: rgba(255, 255, 255, 0.8);
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.875rem;
-  font-weight: 500;
+.dt__bar-title {
+  flex: 1;
+  text-align: center;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.78rem;
+  color: $text-secondary;
+  margin-left: -4.5rem; // optical centering past the dots
 }
 
-// Contenido de la terminal
-.dev-terminal__content {
-  background: #0f0f23;
-  padding: 1.5rem;
-  height: 400px;
+.dt__bar-hint {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.68rem;
+  color: $text-muted;
+  letter-spacing: 0.03em;
+}
+
+// ── Body ──────────────────────────────────────────────────────────────────────
+.dt__body {
+  flex: 1;
   overflow-y: auto;
+  padding: 1.25rem 1.5rem 1rem;
   font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-size: 0.83rem;
+  line-height: 1.65;
   cursor: text;
+  background: #06060f;
 
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-  }
-
+  &::-webkit-scrollbar       { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
   &::-webkit-scrollbar-thumb {
-    background: rgba(79, 172, 254, 0.3);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(79, 172, 254, 0.5);
-    }
+    background: $border-violet;
+    border-radius: 3px;
+    &:hover { background: $accent-primary; }
   }
 }
 
-.dev-terminal__line {
-  margin-bottom: 0.25rem;
+// ── Lines ─────────────────────────────────────────────────────────────────────
+.dt__line {
+  white-space: pre;
 
-  &--command {
-    color: #4facfe;
-    font-weight: 600;
-  }
-
-  &--output {
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  &--error {
-    color: #ff6b6b;
-  }
-
-  &--info {
-    color: #51cf66;
-  }
+  &--cmd     { color: $accent-light;   font-weight: 600; }
+  &--out     { color: #c8d6e5; }
+  &--err     { color: #ff6b7a; }
+  &--success { color: $accent-cyan; }
+  &--accent  { color: $accent-primary; font-weight: 700; letter-spacing: 0.04em; }
+  &--dim     { color: $text-muted; }
+  &--blank   { min-height: 0.6rem; display: block; }
 }
 
-.dev-terminal__input-line {
+// ── Input row ─────────────────────────────────────────────────────────────────
+.dt__input-row {
   display: flex;
   align-items: center;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
-.dev-terminal__prompt {
-  color: #4facfe;
-  font-weight: 600;
-  margin-right: 0.5rem;
+.dt__ps1 {
+  color: $accent-primary;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
-.dev-terminal__input {
+.dt__input {
+  flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: $text-primary;
   font-family: inherit;
   font-size: inherit;
-  flex: 1;
+  caret-color: transparent; // we use the custom caret
 
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-  }
+  &::placeholder { color: $text-muted; }
+  &:disabled { opacity: 0.5; }
 }
 
-.dev-terminal__cursor {
-  color: #4facfe;
-  animation: blink 1s step-end infinite;
-  margin-left: 2px;
+.dt__caret {
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  background: $accent-primary;
+  border-radius: 1px;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: dt-blink 1.1s step-end infinite;
 
-  &--typing {
-    animation: none;
-    opacity: 1;
-  }
+  &--pause { animation: none; opacity: 0.4; }
 }
 
-// Animaciones
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
+// ── Animations ────────────────────────────────────────────────────────────────
+@keyframes dt-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
 }
 
-@keyframes blink {
+// ── Transitions ───────────────────────────────────────────────────────────────
+.dt-pop-enter-active,
+.dt-pop-leave-active { transition: opacity 0.2s, transform 0.2s; }
+.dt-pop-enter-from,
+.dt-pop-leave-to     { opacity: 0; transform: translateY(8px); }
 
-  0%,
-  50% {
-    opacity: 1;
-  }
-
-  51%,
-  100% {
-    opacity: 0;
-  }
-}
-
-// Transiciones
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.3s ease;
-}
-
-.slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.terminal-slide-enter-active,
-.terminal-slide-leave-active {
-  transition: all 0.4s ease;
-}
-
-.terminal-slide-enter-from {
-  opacity: 0;
-  transform: scale(0.9);
-}
-
-.terminal-slide-leave-to {
-  opacity: 0;
-  transform: scale(0.9);
-}
+.dt-slide-enter-active,
+.dt-slide-leave-active { transition: opacity 0.25s, transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.dt-slide-enter-from,
+.dt-slide-leave-to     { opacity: 0; transform: scale(0.95) translateY(12px); }
 </style>

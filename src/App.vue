@@ -3,7 +3,6 @@ import Footer from './components/global/Footer.vue'
 import Header from './components/global/Header.vue'
 import ToastNotification from './components/global/ToastNotification.vue'
 import DevTerminal from './components/base/DevTerminal.vue'
-import FloatingRobot from './components/ui/FloatingRobot.vue'
 </script>
 
 <template>
@@ -14,8 +13,6 @@ import FloatingRobot from './components/ui/FloatingRobot.vue'
   <ToastNotification />
   <Footer />
   <DevTerminal />
-  <!-- Global floating robot — follows scroll & mouse on desktop, widget on mobile -->
-  <FloatingRobot />
 </template>
 
 <style lang="scss">

@@ -23,11 +23,21 @@ const currentYear = new Date().getFullYear();
         </div>
 
         <div class="footer__socials">
-          <a href="https://github.com/yeyodev1" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GH</a>
-          <a href="https://www.linkedin.com/in/yeyodev1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LI</a>
-          <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">WA</a>
-          <a href="https://www.instagram.com/yeyo.dev/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">IG</a>
-          <a href="https://x.com/yeyodev" target="_blank" rel="noopener noreferrer" aria-label="X">𝕏</a>
+          <a href="https://github.com/yeyodev1" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <i class="fa-brands fa-github" />
+          </a>
+          <a href="https://www.linkedin.com/in/yeyodev1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <i class="fa-brands fa-linkedin" />
+          </a>
+          <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+            <i class="fa-brands fa-whatsapp" />
+          </a>
+          <a href="https://www.instagram.com/yeyo.dev/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <i class="fa-brands fa-instagram" />
+          </a>
+          <a href="https://x.com/yeyodev" target="_blank" rel="noopener noreferrer" aria-label="X">
+            <i class="fa-brands fa-x-twitter" />
+          </a>
         </div>
       </div>
 
@@ -120,10 +130,8 @@ const currentYear = new Date().getFullYear();
       border-radius: 8px;
       background: $bg-secondary;
       border: 1px solid $border-subtle;
-      font-size: 0.75rem;
-      font-weight: 700;
+      font-size: 1rem;
       color: $text-secondary;
-      font-family: 'Roboto', sans-serif;
       transition: all 0.25s ease;
 
       &:hover {

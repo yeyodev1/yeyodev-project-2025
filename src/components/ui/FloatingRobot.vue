@@ -4,73 +4,74 @@ import { Application } from '@splinetool/runtime'
 
 const SCENE = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
 
-const desktopCanvas = ref<HTMLCanvasElement | null>(null)
-const mobileCanvas  = ref<HTMLCanvasElement | null>(null)
+// ── Canvas refs ───────────────────────────────────────────────────────────────
+const heroCanvas   = ref<HTMLCanvasElement | null>(null)
+const footerCanvas = ref<HTMLCanvasElement | null>(null)
+const mobileCanvas = ref<HTMLCanvasElement | null>(null)
 
-const isDesktopLoaded = ref(false)
-const isMobileLoaded  = ref(false)
-const mobileExpanded  = ref(false)
+// ── App instances (one per zone — independent state) ─────────────────────────
+let heroApp:   Application | null = null
+let footerApp: Application | null = null
+let mobileApp: Application | null = null
 
-let desktopApp: Application | null = null
-let mobileApp:  Application | null = null
+// ── Loaded flags ──────────────────────────────────────────────────────────────
+const isHeroLoaded   = ref(false)
+const isFooterLoaded = ref(false)
+const isMobileLoaded = ref(false)
+const mobileExpanded = ref(false)
 
-// ── Scroll opacity ───────────────────────────────────────────────────────────
-const opacity = ref(1)
+// ── Per-zone opacity (animated independently) ─────────────────────────────────
+const heroOpacity   = ref(1)
+const footerOpacity = ref(0)
+
+// ── Relay cleanups ────────────────────────────────────────────────────────────
+let cleanupHeroRelay:   (() => void) | null = null
+let cleanupFooterRelay: (() => void) | null = null
+
+// ── Scroll handler — computes each zone's opacity independently ───────────────
 const handleScroll = () => {
-  const progress = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight)
-  opacity.value = Math.max(0.5, 1 - progress * 0.4)
+  const p = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight)
+
+  // Hero:   fully visible 0–20 %, fade out 20–32 %, invisible after that
+  heroOpacity.value =
+    p < 0.20 ? 1 :
+    p < 0.32 ? 1 - (p - 0.20) / 0.12 :
+    0
+
+  // Footer: invisible until 70 %, fade in 70–83 %, fully visible after that
+  footerOpacity.value =
+    p < 0.70 ? 0 :
+    p < 0.83 ? (p - 0.70) / 0.13 :
+    1
+
+  // Lazy-load the footer instance when it first becomes relevant
+  if (p > 0.65 && !footerApp) loadFooter()
 }
 
-// ── Force WebGL background to transparent ────────────────────────────────────
-// CSS can't clear the WebGL clear-color, so we do it through the context directly.
+// ── Force WebGL clear-color to transparent ────────────────────────────────────
 const forceTransparentBg = (canvas: HTMLCanvasElement) => {
-  // Try WebGL2 first, then WebGL1
   const gl =
     canvas.getContext('webgl2', { alpha: true }) ??
     canvas.getContext('webgl',  { alpha: true })
   if (!gl) return
-
-  // Schedule a one-time clear-color override after every Spline render tick
   let frame: number
-  const clear = () => {
-    gl.clearColor(0, 0, 0, 0)
-    frame = requestAnimationFrame(clear)
-  }
-  frame = requestAnimationFrame(clear)
-
-  // Return cleanup
+  const tick = () => { gl.clearColor(0, 0, 0, 0); frame = requestAnimationFrame(tick) }
+  frame = requestAnimationFrame(tick)
   return () => cancelAnimationFrame(frame)
 }
 
-// ── Global mouse → dispatch to canvas so robot head follows anywhere ─────────
-let cleanupMouseRelay: (() => void) | null = null
-
-const attachMouseRelay = (canvas: HTMLCanvasElement) => {
-  // Last known viewport cursor position — initialised to screen center so the
-  // robot looks straight ahead before the user moves the mouse.
-  let lastX = window.innerWidth  / 2
-  let lastY = window.innerHeight / 2
-
-  const fire = (clientX: number, clientY: number) => {
+// ── Build a mouse relay for a single canvas ───────────────────────────────────
+// Returns { fire, cleanup }. Each instance is fully independent.
+const buildRelay = (canvas: HTMLCanvasElement) => {
+  const fire = (clientX: number) => {
     const rect = canvas.getBoundingClientRect()
-
-    // Invert the X-axis tracking: mouse-left → robot-left, mouse-right → robot-right.
-    // We use (1 - clientX/innerWidth) because Spline's internal coordinate 
-    // system for this scene is already flipped relative to standard DOM mouse events. 
-    // We use a 0.0 offset to calibrate the "straight" gaze to the viewport center.
-    const normX   = (1 - clientX / window.innerWidth)
-    const mappedX = rect.left + normX * rect.width
-
-    // Y: clamp to the MIDDLE 40% of the canvas (30 %–70 %).
-    //    Raw mapping [0, innerHeight] → [0, canvasHeight] causes the robot to
-    //    stare at the ceiling whenever the cursor is near the header (~clientY 50).
-    //    Clamped mapping keeps the head roughly forward at all times:
-    //      cursor at top    → 30 % canvas → looks slightly up
-    //      cursor at center → 50 % canvas → looks straight ahead
-    //      cursor at bottom → 70 % canvas → looks slightly down
-    const normY   = clientY / window.innerHeight        // 0 → 1
-    const mappedY = rect.top + (0.30 + normY * 0.40) * rect.height
-
+    // X: map full-screen [0, innerWidth] → [rect.left, rect.right]
+    const mappedX = rect.left + (clientX / window.innerWidth) * rect.width
+    // Y: always the vertical center of the canvas — robot only tracks
+    // left/right (horizontal), never tilts up/down. This permanently
+    // eliminates the "staring at ceiling/floor" issue regardless of
+    // where the cursor is or what Spline's default pose is.
+    const mappedY = rect.top + rect.height * 0.5
     canvas.dispatchEvent(new PointerEvent('pointermove', {
       bubbles: true, cancelable: true,
       clientX: mappedX, clientY: mappedY,
@@ -78,50 +79,49 @@ const attachMouseRelay = (canvas: HTMLCanvasElement) => {
     }))
   }
 
-  const onMouseMove = (e: MouseEvent) => {
-    lastX = e.clientX
-    lastY = e.clientY
-    fire(e.clientX, e.clientY)
-  }
+  const onMove = (e: MouseEvent) => fire(e.clientX)
 
-  // On scroll: re-fire with the last cursor position so Spline doesn't get
-  // "stuck" at a stale Y from before the scroll started.
-  const onScroll = () => fire(lastX, lastY)
+  document.addEventListener('mousemove', onMove, { passive: true })
 
-  // Block Spline's window-level wheel handler (it orbits the 3D camera on
-  // scroll, making the robot tilt/look up as you scroll down the page).
-  // stopPropagation in bubble phase on document stops it before it reaches
-  // window — the browser's native scroll still works because that's handled
-  // natively before JS for passive events.
-  const blockSplineWheel = (e: WheelEvent) => e.stopPropagation()
-
-  document.addEventListener('mousemove', onMouseMove, { passive: true })
-  window.addEventListener('scroll', onScroll,         { passive: true })
-  document.addEventListener('wheel', blockSplineWheel, { passive: true })
-
-  cleanupMouseRelay = () => {
-    document.removeEventListener('mousemove', onMouseMove)
-    window.removeEventListener('scroll', onScroll)
-    document.removeEventListener('wheel', blockSplineWheel)
+  return {
+    fire,
+    cleanup: () => document.removeEventListener('mousemove', onMove),
   }
 }
 
-// ── Load desktop ─────────────────────────────────────────────────────────────
-const loadDesktop = async () => {
-  if (!desktopCanvas.value || desktopApp) return
-  desktopApp = new Application(desktopCanvas.value)
-  await desktopApp.load(SCENE)
+// ── Block Spline's window-level wheel handler (once, shared) ─────────────────
+// Spline registers window.addEventListener('wheel', ...) which orbits the 3D
+// camera on page scroll. Stopping propagation in bubble phase on document
+// intercepts it before it reaches window — native page scroll is unaffected.
+const blockSplineWheel = (e: WheelEvent) => e.stopPropagation()
 
-  // Override WebGL clear color so canvas background is transparent
-  forceTransparentBg(desktopCanvas.value)
-
-  // Relay all page mouse events to the canvas for full-page head tracking
-  attachMouseRelay(desktopCanvas.value)
-
-  isDesktopLoaded.value = true
+// ── Load hero instance (eager) ────────────────────────────────────────────────
+const loadHero = async () => {
+  if (!heroCanvas.value || heroApp) return
+  heroApp = new Application(heroCanvas.value)
+  await heroApp.load(SCENE)
+  forceTransparentBg(heroCanvas.value)
+  const relay = buildRelay(heroCanvas.value)
+  cleanupHeroRelay = relay.cleanup
+  // Fire a centered event so robot looks straight ahead from frame one
+  setTimeout(() => relay.fire(window.innerWidth / 2), 120)
+  isHeroLoaded.value = true
 }
 
-// ── Load mobile (lazy) ───────────────────────────────────────────────────────
+// ── Load footer instance (lazy — only when scroll reaches footer zone) ────────
+const loadFooter = async () => {
+  if (!footerCanvas.value || footerApp) return
+  footerApp = new Application(footerCanvas.value)
+  await footerApp.load(SCENE)
+  forceTransparentBg(footerCanvas.value)
+  const relay = buildRelay(footerCanvas.value)
+  cleanupFooterRelay = relay.cleanup
+  // Fire a centered event so the footer robot starts neutral (not in idle pose)
+  setTimeout(() => relay.fire(window.innerWidth / 2), 120)
+  isFooterLoaded.value = true
+}
+
+// ── Load mobile (lazy on widget expand) ──────────────────────────────────────
 const loadMobile = async () => {
   if (!mobileCanvas.value || mobileApp) return
   mobileApp = new Application(mobileCanvas.value)
@@ -129,35 +129,52 @@ const loadMobile = async () => {
   isMobileLoaded.value = true
 }
 
-watch(mobileExpanded, async (val) => {
-  if (val && !mobileApp) await loadMobile()
-})
+watch(mobileExpanded, async (val) => { if (val && !mobileApp) await loadMobile() })
 
 const isDesktopViewport = () => window.innerWidth >= 1024
 
 onMounted(async () => {
   window.addEventListener('scroll', handleScroll, { passive: true })
-  if (isDesktopViewport()) await loadDesktop()
+  document.addEventListener('wheel', blockSplineWheel, { passive: true })
+  if (isDesktopViewport()) await loadHero()
 })
 
 onUnmounted(() => {
-  desktopApp?.dispose()
+  heroApp?.dispose()
+  footerApp?.dispose()
   mobileApp?.dispose()
-  cleanupMouseRelay?.()
-  window.removeEventListener('scroll', handleScroll)
+  cleanupHeroRelay?.()
+  cleanupFooterRelay?.()
+  window.removeEventListener  ('scroll', handleScroll)
+  document.removeEventListener('wheel',  blockSplineWheel)
 })
 </script>
 
 <template>
-  <!-- ── Desktop: fixed right panel ──────────────────────────────────────── -->
-  <div class="robot-desktop" :style="{ opacity }" aria-hidden="true">
-    <Transition name="robot-fade">
-      <div v-if="!isDesktopLoaded" class="robot-desktop__loader">
-        <div class="loader" />
-        <span>Loading...</span>
-      </div>
-    </Transition>
-    <canvas ref="desktopCanvas" class="robot-desktop__canvas" />
+  <!-- ── Desktop: fixed right panel with TWO independent instances ─────────── -->
+  <div class="robot-desktop" aria-hidden="true">
+
+    <!-- Hero instance — visible in the hero section -->
+    <div class="robot-desktop__zone" :style="{ opacity: heroOpacity, transition: 'opacity 0.6s ease' }">
+      <Transition name="robot-fade">
+        <div v-if="!isHeroLoaded" class="robot-desktop__loader">
+          <div class="loader" />
+          <span>Loading...</span>
+        </div>
+      </Transition>
+      <canvas ref="heroCanvas" class="robot-desktop__canvas" />
+    </div>
+
+    <!-- Footer instance — visible near the footer, fresh tracking state -->
+    <div class="robot-desktop__zone" :style="{ opacity: footerOpacity, transition: 'opacity 0.6s ease' }">
+      <Transition name="robot-fade">
+        <div v-if="footerOpacity > 0 && !isFooterLoaded" class="robot-desktop__loader">
+          <div class="loader" />
+        </div>
+      </Transition>
+      <canvas ref="footerCanvas" class="robot-desktop__canvas" />
+    </div>
+
   </div>
 
   <!-- ── Mobile: floating widget ─────────────────────────────────────────── -->
@@ -198,7 +215,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 
-// ── Desktop panel ───────────────────────────────────────────────────────────
+// ── Desktop panel ────────────────────────────────────────────────────────────
 .robot-desktop {
   display: none;
 
@@ -207,19 +224,21 @@ onUnmounted(() => {
     position: fixed;
     top: 0;
     right: 0;
-    // Wider panel so Spline has more horizontal space → robot renders fully (no bottom crop).
-    // The left ~35% is masked transparent so it never overlaps left-side content.
     width: 50vw;
     max-width: 820px;
     height: 100dvh;
     z-index: 40;
     pointer-events: none;
-    transition: opacity 0.5s ease;
 
-    // Aggressive left-fade: first 35% is transparent → robot visually emerges from right,
-    // and any dark WebGL bg in that zone is invisible.
+    // Fade left edge so robot emerges from the right
     mask-image: linear-gradient(to right, transparent 0%, transparent 20%, black 38%);
     -webkit-mask-image: linear-gradient(to right, transparent 0%, transparent 20%, black 38%);
+  }
+
+  // Each zone stacks on top of the other — opacity handles which is visible
+  &__zone {
+    position: absolute;
+    inset: 0;
   }
 
   &__loader {
@@ -239,8 +258,6 @@ onUnmounted(() => {
     }
   }
 
-  // Canvas: pointer-events ON so Spline fires its own events for internal animations,
-  // but global relay (in script) forwards all document mousemoves here.
   &__canvas {
     display: block;
     width: 100%;
@@ -250,7 +267,7 @@ onUnmounted(() => {
   }
 }
 
-// ── Mobile widget ───────────────────────────────────────────────────────────
+// ── Mobile widget ────────────────────────────────────────────────────────────
 .robot-mobile {
   display: block;
   position: fixed;

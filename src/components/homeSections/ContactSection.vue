@@ -48,10 +48,10 @@ const handleSubmit = async () => {
 }
 
 const socials = [
-  { label: 'WhatsApp', href: 'https://wa.me/17633524852', icon: '💬' },
-  { label: 'Instagram', href: 'https://instagram.com/yeyo.dev', icon: '📸' },
-  { label: 'X / Twitter', href: 'https://x.com/yeyodev', icon: '𝕏' },
-  { label: 'Email', href: 'mailto:diegorele13@gmail.com', icon: '✉️' },
+  { label: 'WhatsApp', href: 'https://wa.me/17633524852', icon: 'fa-brands fa-whatsapp' },
+  { label: 'Instagram', href: 'https://instagram.com/yeyo.dev', icon: 'fa-brands fa-instagram' },
+  { label: 'X / Twitter', href: 'https://x.com/yeyodev', icon: 'fa-brands fa-x-twitter' },
+  { label: 'Email', href: 'mailto:diegorele13@gmail.com', icon: 'fa-solid fa-envelope' },
 ]
 </script>
 
@@ -99,7 +99,7 @@ const socials = [
               rel="noopener noreferrer"
               class="contact__social"
             >
-              <span>{{ s.icon }}</span>
+              <i :class="s.icon" class="contact__social-icon" />
               {{ s.label }}
             </a>
           </div>
@@ -341,6 +341,14 @@ const socials = [
       color: $text-primary;
       transform: translateX(4px);
     }
+  }
+
+  &__social-icon {
+    width: 1rem;
+    text-align: center;
+    font-size: 1rem;
+    color: $accent-light;
+    flex-shrink: 0;
   }
 
   &__availability {

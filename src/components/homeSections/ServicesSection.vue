@@ -1,42 +1,42 @@
 <script setup lang="ts">
 const services = [
   {
-    icon: '⚡',
+    icon: 'fa-solid fa-bolt',
     title: 'Full Stack Development',
     desc: 'End-to-end systems built with Vue.js, Node.js & MongoDB. From architecture to deployment. Fast, clean, scalable.',
     tags: ['Vue.js', 'Node.js', 'MongoDB', 'TypeScript'],
     highlight: false,
   },
   {
-    icon: '🧠',
+    icon: 'fa-solid fa-diagram-project',
     title: 'Business Logic → Software',
     desc: 'My edge: I map your entire workflow by observing how your team works, then I turn that into a system. No bloated specs, just working software.',
     tags: ['Systems Design', 'Process Mapping', 'Custom SaaS'],
     highlight: true,
   },
   {
-    icon: '🎯',
+    icon: 'fa-solid fa-chess-king',
     title: 'Tech Leadership & CTO',
     desc: 'Define architecture, lead dev teams, and translate business strategy into technical decisions. Currently serving as CTO at Bakano.',
     tags: ['Architecture', 'Team Leadership', 'Roadmap', 'Tech Strategy'],
     highlight: false,
   },
   {
-    icon: '🤖',
+    icon: 'fa-solid fa-microchip',
     title: 'AI Integration',
     desc: 'Integrate AI into your product: chatbots, automation, data pipelines, and more. Trained models at Scale AI — I know how the sausage is made.',
     tags: ['AI Tools', 'LLM Integration', 'Automation', 'Data Pipelines'],
     highlight: false,
   },
   {
-    icon: '🌐',
+    icon: 'fa-solid fa-globe',
     title: 'Web & Marketing Sites',
     desc: 'High-conversion websites with clean design, SEO optimization, and modern stacks. Delivered fast — like Opus Dental Lab in 5 days.',
     tags: ['Vue.js', 'SEO', 'Vite', 'Responsive'],
     highlight: false,
   },
   {
-    icon: '🔗',
+    icon: 'fa-solid fa-plug',
     title: 'System Integrations',
     desc: 'Connect your tools: billing systems, CRMs, ERPs, payment gateways, third-party APIs. I\'ve integrated Contifico, Stripe, WhatsApp, and more.',
     tags: ['REST APIs', 'Webhooks', 'Contifico', 'Stripe'],
@@ -67,7 +67,7 @@ const services = [
           class="services__card"
           :class="{ 'services__card--highlight': svc.highlight }"
         >
-          <div class="services__icon">{{ svc.icon }}</div>
+          <div class="services__icon"><i :class="svc.icon" /></div>
           <h3 class="services__card-title">{{ svc.title }}</h3>
           <p class="services__card-desc">{{ svc.desc }}</p>
           <div class="services__tags">
@@ -79,7 +79,7 @@ const services = [
       <!-- Scale AI badge -->
       <div class="services__ai-badge">
         <div class="services__ai-badge-inner">
-          <span class="services__ai-icon">🤝</span>
+          <i class="fa-solid fa-handshake services__ai-icon" />
           <div>
             <strong>Early AI Trainer · Scale AI</strong>
             <p>Part of one of the first teams training GPT-3 &amp; GPT-3.5 — writing original Python, JS &amp; TS code that fed the models.</p>
@@ -186,8 +186,20 @@ const services = [
   }
 
   &__icon {
-    font-size: 2rem;
-    line-height: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(124, 58, 237, 0.12);
+    border-radius: 10px;
+    color: $accent-light;
+    font-size: 1.1rem;
+
+    .services__card--highlight & {
+      background: rgba(124, 58, 237, 0.22);
+      color: $accent-primary;
+    }
   }
 
   &__card-title {

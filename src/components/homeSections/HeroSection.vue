@@ -1,22 +1,30 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
 import GooeyText from '@/components/ui/GooeyText.vue'
 import TextShimmer from '@/components/ui/TextShimmer.vue'
 import SplineScene from '@/components/ui/SplineScene.vue'
+import { useGithub } from '@/composables/useGithub'
 
 const isLoaded = ref(false)
 const mouseX = ref(0)
 const mouseY = ref(0)
-const heroRef = ref<HTMLElement | null>(null)
+const heroRef   = ref<HTMLElement | null>(null)
+const visualRef = ref<HTMLElement | null>(null)
+
+// Spotlight position (% within the visual area)
+const glowX = ref(50)
+const glowY = ref(50)
+
+const { totalCommits, load: loadGithub } = useGithub()
 
 const roles = ['Full Stack Dev', 'CTO @ Bakano', 'Vue.js Expert', 'AI Trainer', 'Tech Architect']
 
-const stats = [
+const stats = computed(() => [
   { value: '6+', label: 'Years exp.' },
-  { value: '3.4K', label: 'Commits' },
+  { value: totalCommits.value > 0 ? (totalCommits.value >= 1000 ? `${(totalCommits.value / 1000).toFixed(1)}K` : String(totalCommits.value)) : '3.4K', label: 'Commits' },
   { value: '4', label: 'Countries' },
   { value: '15+', label: 'Projects' },
-]
+])
 
 const handleMouseMove = (e: MouseEvent) => {
   const rect = heroRef.value?.getBoundingClientRect()
@@ -25,13 +33,24 @@ const handleMouseMove = (e: MouseEvent) => {
   mouseY.value = (e.clientY - rect.top) / rect.height - 0.5
 }
 
+// Global tracker for the glow — runs even when cursor is over the Spline canvas
+const handleGlobalMouse = (e: MouseEvent) => {
+  const rect = visualRef.value?.getBoundingClientRect()
+  if (!rect) return
+  glowX.value = ((e.clientX - rect.left) / rect.width)  * 100
+  glowY.value = ((e.clientY - rect.top)  / rect.height) * 100
+}
+
 onMounted(() => {
   setTimeout(() => (isLoaded.value = true), 100)
   heroRef.value?.addEventListener('mousemove', handleMouseMove)
+  window.addEventListener('mousemove', handleGlobalMouse, { passive: true })
+  loadGithub()
 })
 
 onUnmounted(() => {
   heroRef.value?.removeEventListener('mousemove', handleMouseMove)
+  window.removeEventListener('mousemove', handleGlobalMouse)
 })
 </script>
 
@@ -51,12 +70,22 @@ onUnmounted(() => {
       :style="{ transform: `translate(${mouseX * -25}px, ${mouseY * -25}px)` }"
     />
 
-    <div class="hero__container">
+    <!-- ── Robot — absolute overlay, right side of hero ─────────────────── -->
+    <div ref="visualRef" class="hero__visual">
+      <div
+        class="hero__robot-glow"
+        :style="{ '--gx': glowX + '%', '--gy': glowY + '%' }"
+      />
+      <SplineScene
+        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+        class="hero__spline"
+      />
+    </div>
 
-      <!-- ── LEFT CONTENT ─────────────────────────────── -->
+    <!-- ── Content — floats above the robot ───────────────────────────────── -->
+    <div class="hero__container">
       <div class="hero__content">
 
-        <!-- Shimmer intro -->
         <div class="hero__shimmer-wrap">
           <TextShimmer
             text="Available for projects · Ecuador & Remote"
@@ -65,14 +94,10 @@ onUnmounted(() => {
           />
         </div>
 
-        <!-- Greeting -->
         <p class="hero__greeting">Hey, I'm</p>
-
-        <!-- Name -->
         <h1 class="hero__name">Diego Reyes</h1>
         <p class="hero__alias">aka <span>Yeyo</span></p>
 
-        <!-- Gooey role switcher -->
         <div class="hero__role-wrap">
           <GooeyText
             :texts="roles"
@@ -83,7 +108,6 @@ onUnmounted(() => {
           />
         </div>
 
-        <!-- Description -->
         <p class="hero__desc">
           Full Stack developer with <strong>6+ years</strong> building scalable systems.
           One of the early AI trainers on the team that shaped
@@ -91,7 +115,6 @@ onUnmounted(() => {
           I read businesses like code — and turn what I see into software.
         </p>
 
-        <!-- CTA buttons -->
         <div class="hero__actions">
           <a href="#projects" class="hero__btn hero__btn--primary">
             See my work
@@ -107,7 +130,6 @@ onUnmounted(() => {
           </a>
         </div>
 
-        <!-- Stats -->
         <div class="hero__stats">
           <div v-for="stat in stats" :key="stat.label" class="hero__stat">
             <span class="hero__stat-value">{{ stat.value }}</span>
@@ -116,28 +138,6 @@ onUnmounted(() => {
         </div>
 
       </div>
-
-      <!-- ── RIGHT — Spline 3D ───────────────────────── -->
-      <div class="hero__visual">
-        <!-- Spotlight overlay -->
-        <div class="hero__spotlight" />
-
-        <SplineScene
-          scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-          class="hero__spline"
-        />
-
-        <!-- Photo badge -->
-        <div class="hero__photo-badge">
-          <img
-            src="@/assets/fotos/diego.jpg"
-            alt="Diego Reyes"
-            class="hero__photo"
-          />
-          <div class="hero__photo-ring" />
-        </div>
-      </div>
-
     </div>
 
     <!-- Scroll indicator -->
@@ -230,36 +230,29 @@ onUnmounted(() => {
     }
   }
 
-  // ── Container ─────────────────────────────────────────────────────────────
+  // ── Container — only holds text content, floats above robot ─────────────
   &__container {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: 720px;           // constrain text to left half
     padding: 6rem 1.5rem 4rem;
     display: flex;
     flex-direction: column;
-    gap: 3rem;
 
     @media (min-width: $breakpoint-md) {
-      padding: 0 2rem;
-      flex-direction: row;
-      align-items: center;
+      padding: 0 2rem 0 3rem;
+      justify-content: center;
       min-height: 100svh;
-      gap: 4rem;
     }
 
-    // Desktop: content shifts left, leaving right 42% for FloatingRobot
     @media (min-width: $breakpoint-lg) {
-      padding-right: calc(32vw + 2rem);
-      gap: 0;
+      padding: 0 2rem 0 4rem;
     }
   }
 
   // ── Left content ──────────────────────────────────────────────────────────
   &__content {
-    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
@@ -426,82 +419,40 @@ onUnmounted(() => {
     letter-spacing: 0.06em;
   }
 
-  // ── Right visual (mobile/tablet only) ────────────────────────────────────
-  // On desktop (≥1024px), FloatingRobot.vue takes over — this is hidden
+  // ── Robot visual — covers the entire hero section ────────────────────────
   &__visual {
-    flex: 1;
-    position: relative;
-    height: clamp(320px, 50vw, 520px);
-    border-radius: 24px;
-    overflow: hidden;
-    background: $bg-secondary;
-    border: 1px solid $border-subtle;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
 
-    @media (min-width: $breakpoint-md) {
-      animation: fade-right 0.9s ease-out 0.4s both;
-    }
-
-    // Hidden on desktop — FloatingRobot handles it
-    @media (min-width: $breakpoint-lg) {
-      display: none;
+    @media (max-width: #{$breakpoint-md - 1px}) {
+      opacity: 0.35;   // subtle on mobile so text stays readable
     }
   }
 
-  &__spotlight {
+  // Mouse-following glow that follows the cursor anywhere in the hero
+  &__robot-glow {
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-      ellipse 80% 60% at 60% -10%,
-      rgba(124, 58, 237, 0.25) 0%,
-      transparent 60%
-    );
-    z-index: 2;
     pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(
+      circle 480px at var(--gx, 60%) var(--gy, 50%),
+      rgba(124, 58, 237, 0.30) 0%,
+      rgba(6, 214, 160, 0.10) 45%,
+      transparent 70%
+    );
   }
 
   &__spline {
     position: absolute;
     inset: 0;
     z-index: 1;
-  }
-
-  // Photo badge (bottom-left of visual)
-  &__photo-badge {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    z-index: 10;
-    width: 72px;
-    height: 72px;
-
-    @media (min-width: $breakpoint-md) {
-      width: 90px;
-      height: 90px;
-    }
-  }
-
-  &__photo {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    object-position: center top;
-    position: relative;
-    z-index: 1;
-  }
-
-  &__photo-ring {
-    position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    background: conic-gradient(
-      from 0deg,
-      $accent-primary,
-      $accent-cyan,
-      $accent-primary
-    );
-    z-index: 0;
-    animation: spin-slow 4s linear infinite;
+    pointer-events: auto;   // Spline still gets mouse events for head tracking
   }
 
   // ── Scroll indicator ──────────────────────────────────────────────────────
