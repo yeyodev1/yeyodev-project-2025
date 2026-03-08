@@ -8,6 +8,8 @@ export interface TimelineEntry {
   link?: string
   linkLabel?: string
   badge?: string
+  image?: string
+  imageAlt?: string
 }
 
 interface Props {
@@ -16,114 +18,155 @@ interface Props {
 
 const props = defineProps<Props>()
 
+// ── Scroll-driven line ────────────────────────────────────────────────────────
 const containerRef = ref<HTMLElement | null>(null)
-const lineRef = ref<HTMLElement | null>(null)
-const progressRef = ref<HTMLElement | null>(null)
-const lineHeight = ref(0)
+const lineTrackRef = ref<HTMLElement | null>(null)
 const progressHeight = ref(0)
 
 const updateProgress = () => {
-  if (!containerRef.value || !lineRef.value) return
+  if (!containerRef.value || !lineTrackRef.value) return
   const rect = containerRef.value.getBoundingClientRect()
-  const totalH = lineRef.value.offsetHeight
-  lineHeight.value = totalH
-
+  const trackH = lineTrackRef.value.offsetHeight
   const windowH = window.innerHeight
   const scrolled = Math.max(0, windowH * 0.1 - rect.top)
   const max = rect.height - windowH * 0.5
   const ratio = Math.min(Math.max(scrolled / max, 0), 1)
-  progressHeight.value = totalH * ratio
+  progressHeight.value = trackH * ratio
 }
+
+// ── Entrance animations via IntersectionObserver ──────────────────────────────
+const visibleItems = ref<Set<number>>(new Set())
+let observer: IntersectionObserver | null = null
 
 onMounted(() => {
   updateProgress()
   window.addEventListener('scroll', updateProgress, { passive: true })
   window.addEventListener('resize', updateProgress, { passive: true })
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Number((entry.target as HTMLElement).dataset.index)
+          visibleItems.value = new Set([...visibleItems.value, idx])
+        }
+      })
+    },
+    { threshold: 0.12 },
+  )
+
+  document.querySelectorAll('.tl__item').forEach(el => observer?.observe(el))
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', updateProgress)
   window.removeEventListener('resize', updateProgress)
+  observer?.disconnect()
 })
 </script>
 
 <template>
-  <div ref="containerRef" class="timeline">
-    <div ref="lineRef" class="timeline__line-track">
-      <div
-        ref="progressRef"
-        class="timeline__line-fill"
-        :style="{ height: progressHeight + 'px' }"
-      />
+  <div ref="containerRef" class="tl">
+
+    <!-- Animated vertical line -->
+    <div ref="lineTrackRef" class="tl__line-track">
+      <div class="tl__line-fill" :style="{ height: progressHeight + 'px' }" />
     </div>
 
+    <!-- Items -->
     <div
       v-for="(item, index) in props.data"
       :key="index"
-      class="timeline__item"
+      class="tl__item"
+      :class="{ 'tl__item--visible': visibleItems.has(index) }"
+      :data-index="index"
     >
-      <!-- Dot -->
-      <div class="timeline__dot-col">
-        <div class="timeline__dot">
-          <div class="timeline__dot-inner" />
+      <!-- ── Left: sticky label (desktop) ───────────────────────── -->
+      <div class="tl__left">
+        <div class="tl__dot">
+          <div class="tl__dot-ring" />
+          <div class="tl__dot-core" />
         </div>
-        <h3 class="timeline__year">{{ item.title }}</h3>
+        <h3 class="tl__label">{{ item.title }}</h3>
+        <span v-if="item.badge" class="tl__badge-left">{{ item.badge }}</span>
       </div>
 
-      <!-- Content -->
-      <div class="timeline__content">
-        <h3 class="timeline__year-mobile">{{ item.title }}</h3>
+      <!-- ── Right: content card ────────────────────────────────── -->
+      <div class="tl__card">
 
-        <span v-if="item.badge" class="timeline__badge">{{ item.badge }}</span>
-
-        <p class="timeline__text">{{ item.content }}</p>
-
-        <div v-if="item.tags" class="timeline__tags">
-          <span v-for="tag in item.tags" :key="tag" class="timeline__tag">
-            {{ tag }}
-          </span>
+        <!-- Mobile title -->
+        <div class="tl__mobile-header">
+          <h3 class="tl__mobile-title">{{ item.title }}</h3>
+          <span v-if="item.badge" class="tl__badge">{{ item.badge }}</span>
         </div>
 
-        <a
-          v-if="item.link"
-          :href="item.link"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="timeline__link"
-        >
-          {{ item.linkLabel || 'Ver proyecto' }} →
-        </a>
+        <!-- Screenshot -->
+        <div v-if="item.image" class="tl__image-wrap">
+          <img :src="item.image" :alt="item.imageAlt ?? item.title" class="tl__image" loading="lazy" />
+          <div class="tl__image-overlay" />
+        </div>
+
+        <!-- No image: accent gradient block -->
+        <div v-else class="tl__image-placeholder">
+          <i class="fa-solid fa-code tl__placeholder-icon" />
+        </div>
+
+        <!-- Body -->
+        <div class="tl__body">
+          <span class="tl__badge tl__badge--desktop" v-if="item.badge">{{ item.badge }}</span>
+          <p class="tl__text">{{ item.content }}</p>
+
+          <div v-if="item.tags?.length" class="tl__tags">
+            <span v-for="tag in item.tags" :key="tag" class="tl__tag">{{ tag }}</span>
+          </div>
+
+          <a
+            v-if="item.link"
+            :href="item.link"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="tl__link"
+          >
+            <i class="fa-solid fa-arrow-up-right-from-square" />
+            {{ item.linkLabel || 'Ver proyecto' }}
+          </a>
+        </div>
+
       </div>
     </div>
+
   </div>
 </template>
 
 <style lang="scss" scoped>
 
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-.timeline {
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+}
+
+.tl {
   position: relative;
-  padding-left: 2rem;
 
-  @media (min-width: $breakpoint-md) {
-    padding-left: 0;
-  }
-
-  // ─── Vertical line track ──────────────────────────────────────────────────
+  // ── Scroll line ─────────────────────────────────────────────────────────────
   &__line-track {
     position: absolute;
-    left: 0.75rem;
+    left: 0.5rem;
     top: 0;
     bottom: 0;
     width: 2px;
     background: linear-gradient(
       to bottom,
       transparent 0%,
-      $border-subtle 10%,
-      $border-subtle 90%,
+      rgba(255,255,255,0.06) 8%,
+      rgba(255,255,255,0.06) 92%,
       transparent 100%
     );
-    overflow: hidden;
 
     @media (min-width: $breakpoint-md) {
       left: 2rem;
@@ -137,31 +180,49 @@ onUnmounted(() => {
     width: 100%;
     border-radius: 1px;
     background: linear-gradient(to bottom, $accent-primary, $accent-cyan);
-    transition: height 0.1s linear;
+    transition: height 0.08s linear;
+    filter: drop-shadow(0 0 4px rgba(124, 58, 237, 0.6));
   }
 
-  // ─── Item ─────────────────────────────────────────────────────────────────
+  // ── Item ─────────────────────────────────────────────────────────────────────
   &__item {
     display: flex;
-    gap: 2rem;
-    padding: 2rem 0 3rem;
-    position: relative;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 2.5rem 0 2.5rem 2.5rem;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: none;
 
     @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+      align-items: flex-start;
       gap: 3rem;
-      padding-left: 2rem;
+      padding: 3rem 0 3rem 0;
+    }
+
+    &--visible {
+      animation: item-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+      @for $i from 0 through 5 {
+        &:nth-child(#{$i + 2}) {
+          animation-delay: #{$i * 0.05}s;
+        }
+      }
     }
   }
 
-  // ─── Dot column ───────────────────────────────────────────────────────────
-  &__dot-col {
+  // ── Left sticky column ────────────────────────────────────────────────────
+  &__left {
     display: none;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     position: sticky;
     top: 40%;
     align-self: flex-start;
-    min-width: 120px;
+    width: 200px;
+    flex-shrink: 0;
+    padding-left: 3.5rem;
 
     @media (min-width: $breakpoint-md) {
       display: flex;
@@ -170,123 +231,214 @@ onUnmounted(() => {
 
   &__dot {
     position: absolute;
-    left: -2.75rem;
-    top: 0.25rem;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background: $bg-elevated;
-    border: 2px solid $border-violet;
+    left: -2.25rem;
+    top: 0.15rem;
+    width: 1.125rem;
+    height: 1.125rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
 
     @media (min-width: $breakpoint-md) {
-      position: relative;
-      left: unset;
-      width: 1.25rem;
-      height: 1.25rem;
+      left: 0.65rem;
     }
   }
 
-  &__dot-inner {
+  &__dot-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: $bg-elevated;
+    border: 2px solid $border-violet;
+    animation: dot-pulse 3s ease-in-out infinite;
+  }
+
+  &__dot-core {
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: $accent-light;
+    position: relative;
   }
 
-  &__year {
-    display: none;
-    margin-top: 0.75rem;
-    font-size: 2.5rem;
-    font-weight: 700;
+  &__label {
+    font-size: 1.5rem;
+    font-weight: 800;
     color: $text-muted;
-    text-align: center;
-    line-height: 1;
-    white-space: nowrap;
-
-    @media (min-width: $breakpoint-md) {
-      display: block;
-    }
+    line-height: 1.2;
+    font-family: 'Bitcount', sans-serif;
+    margin-top: 0.5rem;
   }
 
-  // ─── Content ──────────────────────────────────────────────────────────────
-  &__content {
+  &__badge-left {
+    display: inline-block;
+    margin-top: 0.5rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: $accent-gold;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  // ── Card ─────────────────────────────────────────────────────────────────────
+  &__card {
     flex: 1;
-    padding: 1.5rem;
     background: $bg-secondary;
     border: 1px solid $border-subtle;
-    border-radius: 16px;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 
     &:hover {
       border-color: $border-violet;
-      transform: translateY(-3px);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px $border-violet;
     }
   }
 
-  &__year-mobile {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: $accent-light;
-    margin-bottom: 0.75rem;
+  // Mobile header
+  &__mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 1.25rem 1.25rem 0;
 
     @media (min-width: $breakpoint-md) {
       display: none;
     }
   }
 
+  &__mobile-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $accent-light;
+  }
+
+  // Image
+  &__image-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 8;
+    overflow: hidden;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    transition: transform 0.6s ease;
+
+    .tl__card:hover & {
+      transform: scale(1.02);
+    }
+  }
+
+  &__image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(13, 13, 34, 0.85) 100%
+    );
+    pointer-events: none;
+  }
+
+  &__image-placeholder {
+    width: 100%;
+    aspect-ratio: 16 / 6;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(6, 214, 160, 0.08) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid $border-subtle;
+  }
+
+  &__placeholder-icon {
+    font-size: 3rem;
+    color: $border-violet;
+  }
+
+  // Body
+  &__body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
   &__badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.65rem;
     border-radius: 999px;
-    background: rgba(245, 158, 11, 0.12);
+    background: rgba(245, 158, 11, 0.1);
     border: 1px solid rgba(245, 158, 11, 0.3);
     color: $accent-gold;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
+    letter-spacing: 0.06em;
+
+    &--desktop {
+      display: none;
+
+      @media (min-width: $breakpoint-md) {
+        display: inline-block;
+      }
+    }
   }
 
   &__text {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: $text-secondary;
-    line-height: 1.7;
-    margin-bottom: 1rem;
+    line-height: 1.75;
   }
 
   &__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.4rem;
   }
 
   &__tag {
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.65rem;
     background: $bg-elevated;
     border: 1px solid $border-subtle;
     border-radius: 999px;
-    font-size: 0.8rem;
-    color: $text-secondary;
+    font-size: 0.75rem;
+    color: $text-muted;
+    font-family: 'Roboto', monospace;
   }
 
   &__link {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.9rem;
-    font-weight: 500;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
     color: $accent-light;
-    transition: color 0.2s ease, gap 0.2s ease;
+    padding: 0.6rem 1.25rem;
+    border-radius: 999px;
+    border: 1px solid $border-violet;
+    background: rgba(124, 58, 237, 0.08);
+    width: fit-content;
+    transition: all 0.25s ease;
+
+    i { font-size: 0.75rem; }
 
     &:hover {
-      color: $accent-primary;
-      gap: 0.5rem;
+      background: $accent-primary;
+      border-color: $accent-primary;
+      color: $text-primary;
+      transform: translateX(3px);
     }
   }
 }
