@@ -1,65 +1,28 @@
 <script setup lang="ts">
-const services = [
-  {
-    icon: 'fa-solid fa-bolt',
-    title: 'Full Stack Development',
-    desc: 'End-to-end systems built with Vue.js, Node.js & MongoDB. From architecture to deployment. Fast, clean, scalable.',
-    tags: ['Vue.js', 'Node.js', 'MongoDB', 'TypeScript'],
-    highlight: false,
-  },
-  {
-    icon: 'fa-solid fa-diagram-project',
-    title: 'Business Logic → Software',
-    desc: 'My edge: I map your entire workflow by observing how your team works, then I turn that into a system. No bloated specs, just working software.',
-    tags: ['Systems Design', 'Process Mapping', 'Custom SaaS'],
-    highlight: true,
-  },
-  {
-    icon: 'fa-solid fa-chess-king',
-    title: 'Tech Leadership & CTO',
-    desc: 'Define architecture, lead dev teams, and translate business strategy into technical decisions. Currently serving as CTO at Bakano.',
-    tags: ['Architecture', 'Team Leadership', 'Roadmap', 'Tech Strategy'],
-    highlight: false,
-  },
-  {
-    icon: 'fa-solid fa-microchip',
-    title: 'AI Integration',
-    desc: 'Integrate AI into your product: chatbots, automation, data pipelines, and more. Trained models at Scale AI — I know how the sausage is made.',
-    tags: ['AI Tools', 'LLM Integration', 'Automation', 'Data Pipelines'],
-    highlight: false,
-  },
-  {
-    icon: 'fa-solid fa-globe',
-    title: 'Web & Marketing Sites',
-    desc: 'High-conversion websites with clean design, SEO optimization, and modern stacks. Delivered fast — like Opus Dental Lab in 5 days.',
-    tags: ['Vue.js', 'SEO', 'Vite', 'Responsive'],
-    highlight: false,
-  },
-  {
-    icon: 'fa-solid fa-plug',
-    title: 'System Integrations',
-    desc: 'Connect your tools: billing systems, CRMs, ERPs, payment gateways, third-party APIs. I\'ve integrated Contifico, Stripe, WhatsApp, and more.',
-    tags: ['REST APIs', 'Webhooks', 'Contifico', 'Stripe'],
-    highlight: false,
-  },
-]
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, tm } = useI18n()
+
+const services = computed(() => tm('services.items') as Array<{
+  icon: string
+  title: string
+  desc: string
+  tags: string[]
+  highlight: boolean
+}>)
 </script>
 
 <template>
   <section id="services" class="services">
     <div class="services__container">
-
       <div class="services__header">
-        <span class="services__eyebrow">What I do</span>
+        <span class="services__eyebrow">{{ t('services.eyebrow') }}</span>
         <h2 class="services__title">
-          Services &amp; <span class="services__title--accent">Expertise</span>
+          {{ t('services.title') }} <span class="services__title--accent">{{ t('services.titleAccent') }}</span>
         </h2>
-        <p class="services__subtitle">
-          6 years building products across Ecuador, Peru, Spain and the US.
-          I bring both the engineering and the business eye.
-        </p>
+        <p class="services__subtitle">{{ t('services.subtitle') }}</p>
       </div>
-
       <div class="services__grid">
         <div
           v-for="svc in services"
@@ -75,18 +38,15 @@ const services = [
           </div>
         </div>
       </div>
-
-      <!-- Scale AI badge -->
       <div class="services__ai-badge">
         <div class="services__ai-badge-inner">
           <i class="fa-solid fa-handshake services__ai-icon" />
           <div>
-            <strong>Early AI Trainer · Scale AI</strong>
-            <p>Part of one of the first teams training GPT-3 &amp; GPT-3.5 — writing original Python, JS &amp; TS code that fed the models.</p>
+            <strong>{{ t('services.scaleai.title') }}</strong>
+            <p>{{ t('services.scaleai.desc') }}</p>
           </div>
         </div>
       </div>
-
     </div>
   </section>
 </template>

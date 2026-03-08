@@ -1,29 +1,40 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GooeyText from '@/components/ui/GooeyText.vue'
 import TextShimmer from '@/components/ui/TextShimmer.vue'
 import SplineScene from '@/components/ui/SplineScene.vue'
 import { useGithub } from '@/composables/useGithub'
 
+const { t, locale } = useI18n()
 const isLoaded = ref(false)
 const mouseX = ref(0)
 const mouseY = ref(0)
 const heroRef   = ref<HTMLElement | null>(null)
 const visualRef = ref<HTMLElement | null>(null)
-
-// Spotlight position (% within the visual area)
 const glowX = ref(50)
 const glowY = ref(50)
 
 const { totalCommits, load: loadGithub } = useGithub()
 
-const roles = ['Full Stack Dev', 'CTO @ Bakano', 'Vue.js Expert', 'AI Trainer', 'Tech Architect']
+const roles = computed(() =>
+  locale.value === 'es'
+    ? ['Full Stack Dev', 'CTO @ Bakano', 'Experto Vue.js', 'Entrenador IA', 'Arquitecto Tech']
+    : ['Full Stack Dev', 'CTO @ Bakano', 'Vue.js Expert', 'AI Trainer', 'Tech Architect']
+)
 
 const stats = computed(() => [
-  { value: '6+', label: 'Years exp.' },
-  { value: totalCommits.value > 0 ? (totalCommits.value >= 1000 ? `${(totalCommits.value / 1000).toFixed(1)}K` : String(totalCommits.value)) : '3.4K', label: 'Commits' },
-  { value: '4', label: 'Countries' },
-  { value: '15+', label: 'Projects' },
+  { value: '6+', label: t('hero.stats.years') },
+  {
+    value: totalCommits.value > 0
+      ? totalCommits.value >= 1000
+        ? `${(totalCommits.value / 1000).toFixed(1)}K`
+        : String(totalCommits.value)
+      : '3.4K',
+    label: t('hero.stats.commits'),
+  },
+  { value: '4', label: t('hero.stats.countries') },
+  { value: '15+', label: t('hero.stats.projects') },
 ])
 
 const handleMouseMove = (e: MouseEvent) => {
@@ -33,7 +44,6 @@ const handleMouseMove = (e: MouseEvent) => {
   mouseY.value = (e.clientY - rect.top) / rect.height - 0.5
 }
 
-// Global tracker for the glow — runs even when cursor is over the Spline canvas
 const handleGlobalMouse = (e: MouseEvent) => {
   const rect = visualRef.value?.getBoundingClientRect()
   if (!rect) return
@@ -56,11 +66,7 @@ onUnmounted(() => {
 
 <template>
   <section ref="heroRef" class="hero" :class="{ 'hero--loaded': isLoaded }">
-
-    <!-- Background grid -->
     <div class="hero__grid" />
-
-    <!-- Radial glows -->
     <div
       class="hero__glow hero__glow--violet"
       :style="{ transform: `translate(${mouseX * 40}px, ${mouseY * 40}px)` }"
@@ -69,83 +75,43 @@ onUnmounted(() => {
       class="hero__glow hero__glow--cyan"
       :style="{ transform: `translate(${mouseX * -25}px, ${mouseY * -25}px)` }"
     />
-
-    <!-- ── Robot — absolute overlay, right side of hero ─────────────────── -->
     <div ref="visualRef" class="hero__visual">
-      <div
-        class="hero__robot-glow"
-        :style="{ '--gx': glowX + '%', '--gy': glowY + '%' }"
-      />
-      <SplineScene
-        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-        class="hero__spline"
-      />
+      <div class="hero__robot-glow" :style="{ '--gx': glowX + '%', '--gy': glowY + '%' }" />
+      <SplineScene scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" class="hero__spline" />
     </div>
-
-    <!-- ── Content — floats above the robot ───────────────────────────────── -->
     <div class="hero__container">
       <div class="hero__content">
-
         <div class="hero__shimmer-wrap">
-          <TextShimmer
-            text="Available for projects · Ecuador & Remote"
-            :duration="2.5"
-            class="hero__shimmer"
-          />
+          <TextShimmer :text="t('hero.available')" :duration="2.5" class="hero__shimmer" />
         </div>
-
-        <p class="hero__greeting">Hey, I'm</p>
+        <p class="hero__greeting">{{ t('hero.greeting') }}</p>
         <h1 class="hero__name">Diego Reyes</h1>
-        <p class="hero__alias">aka <span>Yeyo</span></p>
-
+        <p class="hero__alias">{{ t('hero.alias') }} <span>Yeyo</span></p>
         <div class="hero__role-wrap">
-          <GooeyText
-            :texts="roles"
-            :morph-time="1.2"
-            :cooldown-time="2"
-            class="hero__gooey"
-            text-class="hero__gooey-text"
-          />
+          <GooeyText :texts="roles" :morph-time="1.2" :cooldown-time="2" class="hero__gooey" text-class="hero__gooey-text" />
         </div>
-
-        <p class="hero__desc">
-          Full Stack developer with <strong>6+ years</strong> building scalable systems.
-          One of the early AI trainers on the team that shaped
-          <strong>GPT-3 & GPT-3.5</strong> at Scale AI. CTO at Bakano.
-          I read businesses like code — and turn what I see into software.
-        </p>
-
+        <p class="hero__desc" v-html="t('hero.desc')" />
         <div class="hero__actions">
           <a href="#projects" class="hero__btn hero__btn--primary">
-            See my work
+            {{ t('hero.seeWork') }}
             <span class="hero__btn-arrow">→</span>
           </a>
-          <a
-            href="https://wa.me/17633524852"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hero__btn hero__btn--secondary"
-          >
-            Let's talk
+          <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" class="hero__btn hero__btn--secondary">
+            {{ t('hero.letsTalk') }}
           </a>
         </div>
-
         <div class="hero__stats">
           <div v-for="stat in stats" :key="stat.label" class="hero__stat">
             <span class="hero__stat-value">{{ stat.value }}</span>
             <span class="hero__stat-label">{{ stat.label }}</span>
           </div>
         </div>
-
       </div>
     </div>
-
-    <!-- Scroll indicator -->
     <div class="hero__scroll">
       <span>Scroll</span>
       <div class="hero__scroll-line" />
     </div>
-
   </section>
 </template>
 

@@ -1,101 +1,90 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Timeline from '@/components/ui/Timeline.vue'
 import type { TimelineEntry } from '@/components/ui/Timeline.vue'
 
-type FilterKey = 'all' | 'web' | 'saas' | 'ai'
+const { t } = useI18n()
 
+type FilterKey = 'all' | 'web' | 'saas' | 'ai'
 const activeFilter = ref<FilterKey>('all')
 
-const filters: { key: FilterKey; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'web', label: 'Web & Marketing' },
-  { key: 'saas', label: 'SaaS / Systems' },
-  { key: 'ai', label: 'AI & Data' },
-]
+const filters = computed(() => [
+  { key: 'all' as FilterKey,  label: t('projects.filters.all') },
+  { key: 'web' as FilterKey,  label: t('projects.filters.web') },
+  { key: 'saas' as FilterKey, label: t('projects.filters.saas') },
+  { key: 'ai' as FilterKey,   label: t('projects.filters.ai') },
+])
 
-const allProjects: (TimelineEntry & { category: FilterKey; duration?: string; url?: string })[] = [
+type ProjectItem = TimelineEntry & { category: FilterKey }
+
+const allProjects = computed<ProjectItem[]>(() => [
   {
     category: 'saas',
-    title: 'Finestra — Nicole Pastry Arts',
-    duration: 'Custom SaaS · Ongoing',
-    badge: 'Live · Production',
-    content:
-      'End-to-end order management system built for Finestra, a company operating three restaurants: Casa Mía, Delacrem & Nicole Pastry Arts. Built by observing the team\'s real workflow — from the moment an order is placed, through production, dispatch, delivery, and warehouse inventory in real time. Integrated with Contifico billing system. Fork-ready for other F&B businesses.',
+    title: t('projects.items.finestra.title'),
+    content: t('projects.items.finestra.content'),
     tags: ['Vue.js', 'Node.js', 'MongoDB', 'Contifico API', 'Real-time', 'Warehouse'],
+    badge: t('projects.items.finestra.badge'),
     link: 'https://nicole-sells-bills.netlify.app/',
-    linkLabel: 'View system',
+    linkLabel: t('projects.items.finestra.linkLabel'),
   },
   {
     category: 'web',
-    title: 'Bakano — Digital Agency',
-    duration: '3 days · CTO build',
-    badge: 'CTO · Full Stack',
-    content:
-      'As CTO and founding developer of Bakano, led the architecture and development of the agency\'s own website and internal tooling. Bakano powers growth marketing, data strategy, Meta Ads performance, and tech consulting for 150+ businesses across Ecuador.',
+    title: t('projects.items.bakano.title'),
+    content: t('projects.items.bakano.content'),
     tags: ['Vue.js', 'SCSS', 'Node.js', 'Data Strategy', 'Tech Leadership'],
+    badge: t('projects.items.bakano.badge'),
     link: 'https://bakano.ec/',
-    linkLabel: 'Visit bakano.ec',
+    linkLabel: t('projects.items.bakano.linkLabel'),
   },
   {
     category: 'web',
-    title: 'Opus Dental Lab',
-    duration: '5 days · full delivery',
-    badge: 'Completed',
-    content:
-      'Full website for Opus Dental Lab LLC, a dental laboratory based in Orlando, FL. Delivered in 5 days — from design to deployment. Clean, professional, SEO-ready.',
+    title: t('projects.items.opus.title'),
+    content: t('projects.items.opus.content'),
     tags: ['Vue.js', 'Vite', 'SCSS', 'SEO', 'Netlify'],
+    badge: t('projects.items.opus.badge'),
     link: 'https://opusdentallab.info/',
-    linkLabel: 'Visit site',
+    linkLabel: t('projects.items.opus.linkLabel'),
   },
   {
     category: 'ai',
-    title: 'Scale AI — GPT-3 & GPT-3.5 Training',
-    duration: 'Mar 2024 – Jan 2025',
-    badge: 'Early Team · AI',
-    content:
-      'Part of one of the earliest AI trainer teams at Scale AI, contributing to the datasets and code samples that helped shape GPT-3 and GPT-3.5. Wrote original Python, JavaScript and TypeScript code to feed the models — no copy-pasted snippets, all crafted logic. Also built evaluation tools, curated datasets and optimized data pipelines.',
+    title: t('projects.items.scaleai.title'),
+    content: t('projects.items.scaleai.content'),
     tags: ['Python', 'TypeScript', 'AI Training', 'RLHF', 'Data Pipelines', 'Scale AI'],
+    badge: t('projects.items.scaleai.badge'),
   },
-]
+])
 
-const displayed = ref(allProjects.filter(p => p.category === 'all' || true))
+const displayed = computed<ProjectItem[]>(() =>
+  activeFilter.value === 'all'
+    ? allProjects.value
+    : allProjects.value.filter(p => p.category === activeFilter.value)
+)
 
-const setFilter = (key: FilterKey) => {
-  activeFilter.value = key
-  displayed.value = key === 'all' ? allProjects : allProjects.filter(p => p.category === key)
-}
+const setFilter = (key: FilterKey) => { activeFilter.value = key }
 
-// Map to TimelineEntry
-const timelineData = (): TimelineEntry[] =>
+const timelineData = computed<TimelineEntry[]>(() =>
   displayed.value.map(p => ({
-    title: p.duration ?? p.title,
+    title: p.title,
     content: p.content,
     tags: p.tags,
     badge: p.badge,
     link: p.link,
     linkLabel: p.linkLabel,
   }))
+)
 </script>
 
 <template>
   <section id="projects" class="projects">
-
     <div class="projects__container">
-
-      <!-- Header -->
       <div class="projects__header">
-        <span class="projects__eyebrow">Portfolio</span>
+        <span class="projects__eyebrow">{{ t('projects.eyebrow') }}</span>
         <h2 class="projects__title">
-          Selected <span class="projects__title--accent">Work</span>
+          {{ t('projects.title') }} <span class="projects__title--accent">{{ t('projects.titleAccent') }}</span>
         </h2>
-        <p class="projects__subtitle">
-          Systems built from scratch — understanding the problem first,
-          then writing every line.
-        </p>
+        <p class="projects__subtitle">{{ t('projects.subtitle') }}</p>
       </div>
-
-      <!-- Filters -->
       <div class="projects__filters">
         <button
           v-for="f in filters"
@@ -103,27 +92,15 @@ const timelineData = (): TimelineEntry[] =>
           class="projects__filter"
           :class="{ 'projects__filter--active': activeFilter === f.key }"
           @click="setFilter(f.key)"
-        >
-          {{ f.label }}
-        </button>
+        >{{ f.label }}</button>
       </div>
-
-      <!-- Timeline -->
-      <Timeline :data="timelineData()" />
-
-      <!-- CTA -->
+      <Timeline :data="timelineData" />
       <div class="projects__cta">
-        <p>Have a system to build? I'll understand your business first.</p>
-        <a
-          href="https://wa.me/17633524852"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="projects__cta-btn"
-        >
-          Start a conversation →
+        <p>{{ t('projects.cta.text') }}</p>
+        <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" class="projects__cta-btn">
+          {{ t('projects.cta.btn') }}
         </a>
       </div>
-
     </div>
   </section>
 </template>

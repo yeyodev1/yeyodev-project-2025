@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t, tm } = useI18n()
 
 interface FormData {
   name: string
@@ -10,194 +13,108 @@ interface FormData {
   message: string
 }
 
-const form = ref<FormData>({
-  name: '',
-  email: '',
-  company: '',
-  budget: '',
-  projectType: '',
-  message: '',
-})
-
+const form = ref<FormData>({ name: '', email: '', company: '', budget: '', projectType: '', message: '' })
 const submitted = ref(false)
 const isSubmitting = ref(false)
 
-const projectTypes = [
-  'Full Stack Web App',
-  'Custom SaaS / System',
-  'Corporate Website',
-  'AI Integration',
-  'Tech Consulting / CTO',
-  'Other',
-]
+const projectTypes = computed(() => tm('contact.form.projectTypes') as string[])
+const budgets = computed(() => tm('contact.form.budgets') as string[])
 
-const budgets = [
-  'Under $1,000',
-  '$1,000 – $5,000',
-  '$5,000 – $15,000',
-  '$15,000+',
-  'Let\'s discuss',
-]
+const socials = computed(() => [
+  { label: t('contact.socials.whatsapp'), href: 'https://wa.me/17633524852',       icon: 'fa-brands fa-whatsapp' },
+  { label: t('contact.socials.instagram'), href: 'https://instagram.com/yeyo.dev', icon: 'fa-brands fa-instagram' },
+  { label: t('contact.socials.twitter'),  href: 'https://x.com/yeyodev',           icon: 'fa-brands fa-x-twitter' },
+  { label: t('contact.socials.email'),    href: 'mailto:diegorele13@gmail.com',    icon: 'fa-solid fa-envelope' },
+])
 
 const handleSubmit = async () => {
   isSubmitting.value = true
-  // UI only — data will connect to CRM later
   await new Promise(resolve => setTimeout(resolve, 1200))
   submitted.value = true
   isSubmitting.value = false
 }
-
-const socials = [
-  { label: 'WhatsApp', href: 'https://wa.me/17633524852', icon: 'fa-brands fa-whatsapp' },
-  { label: 'Instagram', href: 'https://instagram.com/yeyo.dev', icon: 'fa-brands fa-instagram' },
-  { label: 'X / Twitter', href: 'https://x.com/yeyodev', icon: 'fa-brands fa-x-twitter' },
-  { label: 'Email', href: 'mailto:diegorele13@gmail.com', icon: 'fa-solid fa-envelope' },
-]
 </script>
 
 <template>
   <section id="contact" class="contact">
     <div class="contact__container">
-
-      <!-- Header -->
       <div class="contact__header">
-        <span class="contact__eyebrow">Let's build</span>
+        <span class="contact__eyebrow">{{ t('contact.eyebrow') }}</span>
         <h2 class="contact__title">
-          Start a <span class="contact__title--accent">Conversation</span>
+          {{ t('contact.title') }} <span class="contact__title--accent">{{ t('contact.titleAccent') }}</span>
         </h2>
-        <p class="contact__subtitle">
-          I read businesses like code. Tell me what you need — I'll figure out the rest.
-        </p>
+        <p class="contact__subtitle">{{ t('contact.subtitle') }}</p>
       </div>
-
       <div class="contact__layout">
-
-        <!-- Left — info -->
         <div class="contact__info">
           <div class="contact__info-card">
-            <img
-              src="@/assets/fotos/diego.jpg"
-              alt="Diego Reyes"
-              class="contact__avatar"
-            />
+            <img src="@/assets/fotos/diego.jpg" alt="Diego Reyes" class="contact__avatar" />
             <div>
               <strong class="contact__info-name">Diego Reyes</strong>
-              <span class="contact__info-role">CTO · Full Stack Dev · AI Trainer</span>
+              <span class="contact__info-role">{{ t('contact.info.role') }}</span>
             </div>
           </div>
-
-          <p class="contact__info-text">
-            Based in Ecuador · available worldwide. I typically respond within a few hours.
-          </p>
-
+          <p class="contact__info-text">{{ t('contact.info.based') }}</p>
           <div class="contact__socials">
-            <a
-              v-for="s in socials"
-              :key="s.label"
-              :href="s.href"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="contact__social"
-            >
+            <a v-for="s in socials" :key="s.label" :href="s.href" target="_blank" rel="noopener noreferrer" class="contact__social">
               <i :class="s.icon" class="contact__social-icon" />
               {{ s.label }}
             </a>
           </div>
-
           <div class="contact__availability">
             <span class="contact__dot" />
-            Available for new projects
+            {{ t('contact.info.availability') }}
           </div>
         </div>
-
-        <!-- Right — form -->
         <div class="contact__form-wrap">
           <Transition name="slide-fade" mode="out-in">
-
             <form v-if="!submitted" class="contact__form" @submit.prevent="handleSubmit">
-
               <div class="contact__row">
                 <div class="contact__field">
-                  <label class="contact__label">Full Name *</label>
-                  <input
-                    v-model="form.name"
-                    type="text"
-                    required
-                    placeholder="Jane Smith"
-                    class="contact__input"
-                  />
+                  <label class="contact__label">{{ t('contact.form.name') }}</label>
+                  <input v-model="form.name" type="text" required :placeholder="t('contact.form.namePlaceholder')" class="contact__input" />
                 </div>
                 <div class="contact__field">
-                  <label class="contact__label">Email *</label>
-                  <input
-                    v-model="form.email"
-                    type="email"
-                    required
-                    placeholder="jane@company.com"
-                    class="contact__input"
-                  />
+                  <label class="contact__label">{{ t('contact.form.email') }}</label>
+                  <input v-model="form.email" type="email" required :placeholder="t('contact.form.emailPlaceholder')" class="contact__input" />
                 </div>
               </div>
-
               <div class="contact__field">
-                <label class="contact__label">Company / Project name</label>
-                <input
-                  v-model="form.company"
-                  type="text"
-                  placeholder="Acme Corp"
-                  class="contact__input"
-                />
+                <label class="contact__label">{{ t('contact.form.company') }}</label>
+                <input v-model="form.company" type="text" :placeholder="t('contact.form.companyPlaceholder')" class="contact__input" />
               </div>
-
               <div class="contact__row">
                 <div class="contact__field">
-                  <label class="contact__label">Project type *</label>
+                  <label class="contact__label">{{ t('contact.form.projectType') }}</label>
                   <select v-model="form.projectType" required class="contact__input contact__select">
-                    <option value="" disabled>Select one…</option>
+                    <option value="" disabled>{{ t('contact.form.projectTypePlaceholder') }}</option>
                     <option v-for="pt in projectTypes" :key="pt" :value="pt">{{ pt }}</option>
                   </select>
                 </div>
                 <div class="contact__field">
-                  <label class="contact__label">Budget range</label>
+                  <label class="contact__label">{{ t('contact.form.budget') }}</label>
                   <select v-model="form.budget" class="contact__input contact__select">
-                    <option value="" disabled>Select range…</option>
+                    <option value="" disabled>{{ t('contact.form.budgetPlaceholder') }}</option>
                     <option v-for="b in budgets" :key="b" :value="b">{{ b }}</option>
                   </select>
                 </div>
               </div>
-
               <div class="contact__field">
-                <label class="contact__label">Tell me about your project *</label>
-                <textarea
-                  v-model="form.message"
-                  required
-                  rows="4"
-                  placeholder="Describe what you need, the problem you're solving, or what excites you about this project…"
-                  class="contact__input contact__textarea"
-                />
+                <label class="contact__label">{{ t('contact.form.message') }}</label>
+                <textarea v-model="form.message" required rows="4" :placeholder="t('contact.form.messagePlaceholder')" class="contact__input contact__textarea" />
               </div>
-
-              <button
-                type="submit"
-                class="contact__submit"
-                :disabled="isSubmitting"
-              >
+              <button type="submit" class="contact__submit" :disabled="isSubmitting">
                 <span v-if="isSubmitting" class="contact__spinner" />
-                <span v-else>Send message →</span>
+                <span v-else>{{ t('contact.form.submit') }}</span>
               </button>
-
             </form>
-
-            <!-- Success state -->
             <div v-else class="contact__success">
               <div class="contact__success-icon">✓</div>
-              <h3>Message received!</h3>
-              <p>Thanks for reaching out. I'll get back to you shortly.</p>
+              <h3>{{ t('contact.success.title') }}</h3>
+              <p>{{ t('contact.success.text') }}</p>
             </div>
-
           </Transition>
         </div>
-
       </div>
     </div>
   </section>

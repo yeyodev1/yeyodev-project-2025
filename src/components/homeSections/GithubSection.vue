@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useGithub } from '@/composables/useGithub'
 import { useCountUp, fmtNum } from '@/composables/useCountUp'
+
+const { t } = useI18n()
 
 const {
   user, topRepos, recentCommits, totalStars,
@@ -119,24 +122,24 @@ const barPercent = computed(() => {
       <!-- Header -->
       <div class="ghs__header">
         <span class="ghs__eyebrow">
-          <i class="fa-brands fa-github" /> Open Source · Real-time
+          <i class="fa-brands fa-github" /> {{ t('github.eyebrow') }}
         </span>
         <h2 class="ghs__title">
-          GitHub <span class="ghs__title--accent">Stats</span>
+          {{ t('github.title') }} <span class="ghs__title--accent">{{ t('github.titleAccent') }}</span>
         </h2>
         <p class="ghs__subtitle">
-          Live data pulled directly from the GitHub API.
+          {{ t('github.subtitle') }}
         </p>
       </div>
 
       <!-- Loading state -->
       <div v-if="loading" class="ghs__loading">
         <div class="ghs__spinner" />
-        <span>Fetching GitHub data…</span>
+        <span>{{ t('github.loading') }}</span>
       </div>
 
       <div v-else-if="error" class="ghs__error">
-        <i class="fa-solid fa-triangle-exclamation" /> {{ error }}
+        <i class="fa-solid fa-triangle-exclamation" /> {{ t('github.error') }}
       </div>
 
       <template v-else-if="user">
@@ -147,7 +150,7 @@ const barPercent = computed(() => {
             <div class="ghs__hero-glow" />
             <i class="fa-solid fa-code-commit ghs__hero-icon" />
             <span class="ghs__hero-value">{{ fmtNum(displayTotal) }}</span>
-            <span class="ghs__hero-label">Total Commits</span>
+            <span class="ghs__hero-label">{{ t('github.stats.commits') }}</span>
             <span v-if="totalCommits === 0" class="ghs__loading-dots">
               <span /><span /><span />
             </span>
@@ -156,26 +159,26 @@ const barPercent = computed(() => {
           <div class="ghs__hero-stat">
             <i class="fa-solid fa-code-branch ghs__hero-icon ghs__hero-icon--violet" />
             <span class="ghs__hero-value">{{ fmtNum(displayRepos) }}</span>
-            <span class="ghs__hero-label">Repositories</span>
+            <span class="ghs__hero-label">{{ t('github.stats.repos') }}</span>
           </div>
 
           <div class="ghs__hero-stat">
             <i class="fa-solid fa-star ghs__hero-icon ghs__hero-icon--gold" />
             <span class="ghs__hero-value">{{ fmtNum(displayStars) }}</span>
-            <span class="ghs__hero-label">Total Stars</span>
+            <span class="ghs__hero-label">{{ t('github.stats.stars') }}</span>
           </div>
 
           <div class="ghs__hero-stat">
             <i class="fa-solid fa-users ghs__hero-icon ghs__hero-icon--cyan" />
             <span class="ghs__hero-value">{{ user.followers }}</span>
-            <span class="ghs__hero-label">Followers</span>
+            <span class="ghs__hero-label">{{ t('github.stats.followers') }}</span>
           </div>
         </div>
 
         <!-- ── Year-by-year commit chart ─────────────────────────────────────── -->
         <div class="ghs__years-wrap">
           <h3 class="ghs__section-title">
-            <i class="fa-solid fa-chart-column" /> Commits by year
+            <i class="fa-solid fa-chart-column" /> {{ t('github.chart') }}
           </h3>
 
           <div class="ghs__years">
@@ -205,7 +208,7 @@ const barPercent = computed(() => {
               <!-- Year label -->
               <span class="ghs__year-label">
                 {{ y.year }}
-                <span v-if="y.isCurrent" class="ghs__year-badge">now</span>
+                <span v-if="y.isCurrent" class="ghs__year-badge">{{ t('github.current') }}</span>
               </span>
             </div>
           </div>
@@ -217,7 +220,7 @@ const barPercent = computed(() => {
           <!-- Recent commits -->
           <div class="ghs__card">
             <h3 class="ghs__card-title">
-              <i class="fa-solid fa-clock-rotate-left" /> Recent Commits
+              <i class="fa-solid fa-clock-rotate-left" /> {{ t('github.recentCommits') }}
             </h3>
             <ul class="ghs__commit-list">
               <li v-for="c in recentCommits" :key="c.sha" class="ghs__commit">
@@ -234,7 +237,7 @@ const barPercent = computed(() => {
           <!-- Top repos -->
           <div class="ghs__card">
             <h3 class="ghs__card-title">
-              <i class="fa-solid fa-star" /> Top Repositories
+              <i class="fa-solid fa-star" /> {{ t('github.topRepos') }}
             </h3>
             <ul class="ghs__repo-list">
               <li v-for="r in topRepos" :key="r.id" class="ghs__repo">
@@ -254,7 +257,7 @@ const barPercent = computed(() => {
             </ul>
 
             <a :href="user.html_url" target="_blank" rel="noopener noreferrer" class="ghs__gh-link">
-              <i class="fa-brands fa-github" /> View all repositories →
+              <i class="fa-brands fa-github" /> {{ t('github.viewAll') }}
             </a>
           </div>
 
