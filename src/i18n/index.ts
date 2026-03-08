@@ -15,6 +15,7 @@ const es = {
   hero: {
     greeting: 'Hola, soy',
     name: 'Diego Reyes',
+    availableForProjects: 'Disponible para proyectos',
     roles: {
       frontend: 'Frontend Developer',
       fullstack: 'Fullstack Developer',
@@ -204,6 +205,7 @@ const en = {
   hero: {
     greeting: "Hi, I'm",
     name: 'Diego Reyes',
+    availableForProjects: 'Available for projects',
     roles: {
       frontend: 'Frontend Developer',
       fullstack: 'Fullstack Developer',

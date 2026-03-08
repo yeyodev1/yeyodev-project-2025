@@ -152,7 +152,7 @@ const clearAllFilters = () => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .blog-filters {
   position: sticky;

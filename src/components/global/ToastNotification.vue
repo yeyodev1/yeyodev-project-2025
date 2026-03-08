@@ -30,7 +30,7 @@ const toastIcon = computed(() => {
 </template>
 
 <style scoped lang="scss">
-@use '@/styles/index.scss' as *;
+
 
 .toast-notification {
   position: fixed;

@@ -97,7 +97,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .post-view {
   min-height: 100vh;

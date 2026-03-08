@@ -1,8 +1,37 @@
-$YEYO-BLUE: #22223b;
+// ─── Premium Dark Portfolio Palette ───────────────────────────────────────────
+// Backgrounds
+$bg-deep:       #04040c;   // Deepest dark — body base
+$bg-primary:    #07071a;   // Main sections
+$bg-secondary:  #0d0d22;   // Cards / panels
+$bg-elevated:   #12122e;   // Hover / elevated surfaces
+
+// Accent – Electric Violet (primary)
+$accent-primary:   #7c3aed;   // Main CTA, highlights
+$accent-light:     #a78bfa;   // Soft violet for glows / text
+$accent-glow:      rgba(124, 58, 237, 0.35);
+
+// Accent – Cyan (secondary)
+$accent-cyan:      #06d6a0;   // Success, secondary CTAs
+$accent-cyan-glow: rgba(6, 214, 160, 0.25);
+
+// Gold — for special badges / Scale AI / timeline
+$accent-gold:      #f59e0b;
+$accent-gold-glow: rgba(245, 158, 11, 0.2);
+
+// Text
+$text-primary:   #f1f5f9;   // Headings, main copy
+$text-secondary: #94a3b8;   // Body / descriptive text
+$text-muted:     #4b5563;   // Placeholders, disabled
+
+// Borders
+$border-violet:  rgba(124, 58, 237, 0.25);
+$border-subtle:  rgba(255, 255, 255, 0.06);
+$border-white:   rgba(255, 255, 255, 0.12);
+
+// Legacy (kept for any remaining references)
+$YEYO-BLUE:   #22223b;
 $YEYO-VIOLET: #4a4e69;
-$YEYO-ROSE: #c9ada7;
+$YEYO-ROSE:   #c9ada7;
 $YEYO-ORANGE: #f2e9e4;
-
-$white: #ffffff;
-
-$green: #69ad69;
+$white:        #ffffff;
+$green:        #69ad69;

@@ -118,7 +118,7 @@ const toggleViewMode = () => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .blog-view {
   min-height: 100vh;

@@ -159,7 +159,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .blog-card {
   background: rgba(255, 255, 255, 0.05);

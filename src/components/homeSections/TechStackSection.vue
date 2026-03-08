@@ -123,7 +123,7 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 @keyframes category-fade-in {
   from {

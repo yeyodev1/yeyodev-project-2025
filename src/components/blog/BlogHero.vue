@@ -121,7 +121,7 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .blog-hero {
   position: relative;

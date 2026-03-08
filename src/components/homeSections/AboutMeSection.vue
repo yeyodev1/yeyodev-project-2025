@@ -146,7 +146,7 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 // Animaciones sofisticadas
 @keyframes float-gentle {

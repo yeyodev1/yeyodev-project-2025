@@ -36,7 +36,7 @@ const props = defineProps({
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .card {
   display: block;

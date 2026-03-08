@@ -22,7 +22,7 @@ const componentTag = computed(() => (props.href ? 'a' : 'button'));
 </template>
 
 <style lang="scss" scoped>
-@use '@/styles/index.scss' as *;
+
 
 .button {
   display: inline-block;

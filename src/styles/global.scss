@@ -1,8 +1,69 @@
+// @use MUST come before @import — this fixes the SCSS ordering error
 @use './index.scss' as *;
 
-html,
-body {
-  background-color: $white;
+// Tailwind v4
+@import "tailwindcss";
+
+// ─── Google Fonts ──────────────────────────────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;900&display=swap');
+
+// ─── Global reset & base ───────────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   margin: 0;
-  font-family: $font-principal;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: $bg-deep;
+  color: $text-primary;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Bitcount', sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+a {
+  color: $accent-light;
+  text-decoration: none;
+}
+
+// ─── Scrollbar ─────────────────────────────────────────────────────────────────
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: $bg-primary; }
+::-webkit-scrollbar-thumb { background: $accent-primary; border-radius: 3px; }
+
+// ─── Selection ─────────────────────────────────────────────────────────────────
+::selection {
+  background: rgba(124, 58, 237, 0.35);
+  color: $text-primary;
+}
+
+// ─── Loader ────────────────────────────────────────────────────────────────────
+.loader {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(124, 58, 237, 0.2);
+  border-top-color: $accent-primary;
+  border-radius: 50%;
+  animation: _spin 0.8s linear infinite;
+}
+
+@keyframes _spin {
+  to { transform: rotate(360deg); }
 }

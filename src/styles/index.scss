@@ -1,57 +1,11 @@
+// ─── Variables-only file ───────────────────────────────────────────────────────
+// This file is injected into every component via vite.config.ts preprocessorOptions
+// It must ONLY contain @forward, variables, mixins, and functions — NO CSS rules.
+
 @forward 'colorVariables.module.scss';
 @forward 'fonts.modules.scss';
 
+$breakpoint-sm: 480px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1200px;
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 100%;
-  scroll-behavior: smooth;
-}
-
-body {
-  background-color: #f2e9e4; // Usando el valor directo de $YEYO-ORANGE
-  color: #22223b; // Usando el valor directo de $YEYO-BLUE
-  font-family: 'Roboto', sans-serif; // Usando el valor de $font-secondary
-  font-size: 1.125rem;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: 'Bitcount', sans-serif; // Usando el valor de $font-principal
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-a {
-  color: #4a4e69; // Usando el valor directo de $YEYO-VIOLET
-  text-decoration: none;
-}
-
-// Contenedor principal para centrar el contenido
-.container {
-  width: 100%;
-  max-width: $breakpoint-xl;
-  margin: 0 auto;
-  padding: 0 1rem; // Padding para móviles
-
-  @media (min-width: $breakpoint-md) {
-    padding: 0 2rem; // Padding para tablets y escritorio
-  }
-}
