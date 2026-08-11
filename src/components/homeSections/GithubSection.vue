@@ -7,9 +7,17 @@ import { useCountUp, fmtNum } from '@/composables/useCountUp'
 const { t } = useI18n()
 
 const {
-  user, topRepos, recentCommits, totalStars,
-  totalCommits, yearsData, maxYearCommits,
-  loading, error, load, loadCommitsByYear,
+  user,
+  topRepos,
+  recentCommits,
+  totalStars,
+  totalCommits,
+  yearsData,
+  maxYearCommits,
+  loading,
+  error,
+  load,
+  loadCommitsByYear,
 } = useGithub()
 
 // ── Count-up instances ────────────────────────────────────────────────────────
@@ -22,7 +30,10 @@ const yearDisplays = ref<Record<number, number>>({})
 const yearFrames: Record<number, number> = {}
 
 function animateYear(year: number, target: number, delay: number) {
-  if (target <= 0) { yearDisplays.value[year] = 0; return }
+  if (target <= 0) {
+    yearDisplays.value[year] = 0
+    return
+  }
   setTimeout(() => {
     const duration = 1800
     const startTime = performance.now()
@@ -37,12 +48,12 @@ function animateYear(year: number, target: number, delay: number) {
 }
 
 onUnmounted(() => {
-  Object.values(yearFrames).forEach(f => cancelAnimationFrame(f))
+  Object.values(yearFrames).forEach((f) => cancelAnimationFrame(f))
 })
 
 // ── Intersection Observer ─────────────────────────────────────────────────────
 const sectionRef = ref<HTMLElement | null>(null)
-const isVisible  = ref(false)
+const isVisible = ref(false)
 let observer: IntersectionObserver | null = null
 
 onMounted(() => {
@@ -79,7 +90,7 @@ watch([isVisible, totalCommits, totalStars, () => user.value?.public_repos], ([v
 
 watch([isVisible, yearsData], ([vis]) => {
   if (!vis || yearsTriggered) return
-  const loaded = yearsData.value.filter(y => y.count !== null)
+  const loaded = yearsData.value.filter((y) => y.count !== null)
   if (loaded.length === 0) return
   yearsTriggered = true
   yearsData.value.forEach((y, i) => {
@@ -93,14 +104,18 @@ watch(totalCommits, (val) => {
 })
 
 // Animate new year data as it arrives
-watch(yearsData, (newVal) => {
-  if (!isVisible.value) return
-  newVal.forEach((y, i) => {
-    if (y.count !== null && !yearDisplays.value[y.year]) {
-      animateYear(y.year, y.count, i * 80)
-    }
-  })
-}, { deep: true })
+watch(
+  yearsData,
+  (newVal) => {
+    if (!isVisible.value) return
+    newVal.forEach((y, i) => {
+      if (y.count !== null && !yearDisplays.value[y.year]) {
+        animateYear(y.year, y.count, i * 80)
+      }
+    })
+  },
+  { deep: true },
+)
 
 // ── Bar height (0–100%) ───────────────────────────────────────────────────────
 const barPercent = computed(() => {
@@ -118,14 +133,14 @@ const barPercent = computed(() => {
     <div class="ghs__bg-grid" />
 
     <div class="ghs__container">
-
       <!-- Header -->
       <div class="ghs__header">
         <span class="ghs__eyebrow">
           <i class="fa-brands fa-github" /> {{ t('github.eyebrow') }}
         </span>
         <h2 class="ghs__title">
-          {{ t('github.title') }} <span class="ghs__title--accent">{{ t('github.titleAccent') }}</span>
+          {{ t('github.title') }}
+          <span class="ghs__title--accent">{{ t('github.titleAccent') }}</span>
         </h2>
         <p class="ghs__subtitle">
           {{ t('github.subtitle') }}
@@ -143,7 +158,6 @@ const barPercent = computed(() => {
       </div>
 
       <template v-else-if="user">
-
         <!-- ── Hero counter row ───────────────────────────────────────────────── -->
         <div class="ghs__hero-stats">
           <div class="ghs__hero-stat ghs__hero-stat--main">
@@ -216,7 +230,6 @@ const barPercent = computed(() => {
 
         <!-- ── Bottom grid: recent commits + top repos ───────────────────────── -->
         <div class="ghs__grid">
-
           <!-- Recent commits -->
           <div class="ghs__card">
             <h3 class="ghs__card-title">
@@ -242,7 +255,12 @@ const barPercent = computed(() => {
             <ul class="ghs__repo-list">
               <li v-for="r in topRepos" :key="r.id" class="ghs__repo">
                 <div class="ghs__repo-main">
-                  <a :href="r.html_url" target="_blank" rel="noopener noreferrer" class="ghs__repo-name">
+                  <a
+                    :href="r.html_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="ghs__repo-name"
+                  >
                     <i class="fa-regular fa-folder-open" />
                     {{ r.name }}
                   </a>
@@ -250,8 +268,12 @@ const barPercent = computed(() => {
                 </div>
                 <div class="ghs__repo-meta">
                   <span v-if="r.language" class="ghs__repo-lang">{{ r.language }}</span>
-                  <span class="ghs__repo-stars"><i class="fa-solid fa-star" /> {{ r.stargazers_count }}</span>
-                  <span class="ghs__repo-forks"><i class="fa-solid fa-code-fork" /> {{ r.forks_count }}</span>
+                  <span class="ghs__repo-stars"
+                    ><i class="fa-solid fa-star" /> {{ r.stargazers_count }}</span
+                  >
+                  <span class="ghs__repo-forks"
+                    ><i class="fa-solid fa-code-fork" /> {{ r.forks_count }}</span
+                  >
                 </div>
               </li>
             </ul>
@@ -260,27 +282,45 @@ const barPercent = computed(() => {
               <i class="fa-brands fa-github" /> {{ t('github.viewAll') }}
             </a>
           </div>
-
         </div>
-
       </template>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-
-@keyframes spin        { to { transform: rotate(360deg); } }
-@keyframes pulse-glow  {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50%      { opacity: 1;   transform: scale(1.08); }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
 }
 @keyframes dot-bounce {
-  0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
-  40%           { transform: scale(1); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 @keyframes bar-grow {
-  from { height: 0; }
+  from {
+    height: 0;
+  }
 }
 
 .ghs {
@@ -308,7 +348,9 @@ const barPercent = computed(() => {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
-    @media (min-width: $breakpoint-md) { padding: 0 2rem; }
+    @media (min-width: $breakpoint-md) {
+      padding: 0 2rem;
+    }
   }
 
   // ── Header ──────────────────────────────────────────────────────────────────
@@ -404,7 +446,9 @@ const barPercent = computed(() => {
     align-items: center;
     gap: 0.3rem;
     overflow: hidden;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    transition:
+      border-color 0.3s ease,
+      transform 0.3s ease;
 
     &:hover {
       border-color: $border-violet;
@@ -436,9 +480,15 @@ const barPercent = computed(() => {
     margin-bottom: 0.25rem;
     position: relative;
 
-    &--violet { color: $accent-primary; }
-    &--gold   { color: $accent-gold; }
-    &--cyan   { color: $accent-cyan; }
+    &--violet {
+      color: $accent-primary;
+    }
+    &--gold {
+      color: $accent-gold;
+    }
+    &--cyan {
+      color: $accent-cyan;
+    }
   }
 
   &__hero-value {
@@ -476,8 +526,12 @@ const barPercent = computed(() => {
       background: $accent-primary;
       animation: dot-bounce 1.4s ease-in-out infinite;
 
-      &:nth-child(2) { animation-delay: 0.2s; }
-      &:nth-child(3) { animation-delay: 0.4s; }
+      &:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      &:nth-child(3) {
+        animation-delay: 0.4s;
+      }
     }
   }
 
@@ -490,7 +544,9 @@ const barPercent = computed(() => {
     margin-bottom: 2rem;
     transition: border-color 0.3s ease;
 
-    &:hover { border-color: $border-violet; }
+    &:hover {
+      border-color: $border-violet;
+    }
   }
 
   &__section-title {
@@ -504,7 +560,9 @@ const barPercent = computed(() => {
     align-items: center;
     gap: 0.5rem;
 
-    i { color: $accent-primary; }
+    i {
+      color: $accent-primary;
+    }
   }
 
   &__years {
@@ -517,7 +575,9 @@ const barPercent = computed(() => {
 
     // Hide scrollbar but keep scroll
     scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   &__year-card {
@@ -531,8 +591,12 @@ const barPercent = computed(() => {
     justify-content: flex-end;
     cursor: default;
 
-    &--current .ghs__year-label { color: $accent-cyan; }
-    &--current .ghs__year-count { color: $accent-cyan; }
+    &--current .ghs__year-label {
+      color: $accent-cyan;
+    }
+    &--current .ghs__year-count {
+      color: $accent-cyan;
+    }
   }
 
   &__bar-track {
@@ -616,7 +680,9 @@ const barPercent = computed(() => {
     gap: 1.25rem;
     transition: border-color 0.3s ease;
 
-    &:hover { border-color: $border-violet; }
+    &:hover {
+      border-color: $border-violet;
+    }
   }
 
   &__card-title {
@@ -629,7 +695,9 @@ const barPercent = computed(() => {
     align-items: center;
     gap: 0.5rem;
 
-    i { color: $accent-primary; }
+    i {
+      color: $accent-primary;
+    }
   }
 
   // Commits
@@ -716,8 +784,13 @@ const barPercent = computed(() => {
     color: $text-primary;
     transition: color 0.2s ease;
 
-    i { color: $accent-primary; font-size: 0.8rem; }
-    &:hover { color: $accent-light; }
+    i {
+      color: $accent-primary;
+      font-size: 0.8rem;
+    }
+    &:hover {
+      color: $accent-light;
+    }
   }
 
   &__repo-desc {
@@ -751,10 +824,14 @@ const barPercent = computed(() => {
     font-size: 0.72rem;
     color: $text-muted;
 
-    i { font-size: 0.65rem; }
+    i {
+      font-size: 0.65rem;
+    }
   }
 
-  &__repo-stars i { color: $accent-gold; }
+  &__repo-stars i {
+    color: $accent-gold;
+  }
 
   &__gh-link {
     display: inline-flex;
@@ -765,7 +842,9 @@ const barPercent = computed(() => {
     margin-top: 0.5rem;
     transition: color 0.2s ease;
 
-    &:hover { color: $text-primary; }
+    &:hover {
+      color: $text-primary;
+    }
   }
 }
 </style>
