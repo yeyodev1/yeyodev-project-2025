@@ -60,8 +60,7 @@ export interface GithubEvent {
 
 // ── API calls ────────────────────────────────────────────────────────────────
 
-export const fetchUser = (): Promise<GithubUser> =>
-  get<GithubUser>(`/users/${GITHUB_USER}`)
+export const fetchUser = (): Promise<GithubUser> => get<GithubUser>(`/users/${GITHUB_USER}`)
 
 export const fetchRepos = (): Promise<GithubRepo[]> =>
   get<GithubRepo[]>(`/users/${GITHUB_USER}/repos?sort=pushed&per_page=100&type=owner`)
