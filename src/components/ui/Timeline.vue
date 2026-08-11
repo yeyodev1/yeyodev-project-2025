@@ -45,7 +45,7 @@ onMounted(() => {
 
   observer = new IntersectionObserver(
     (entries) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const idx = Number((entry.target as HTMLElement).dataset.index)
           visibleItems.value = new Set([...visibleItems.value, idx])
@@ -55,7 +55,7 @@ onMounted(() => {
     { threshold: 0.12 },
   )
 
-  document.querySelectorAll('.tl__item').forEach(el => observer?.observe(el))
+  document.querySelectorAll('.tl__item').forEach((el) => observer?.observe(el))
 })
 
 onUnmounted(() => {
@@ -67,7 +67,6 @@ onUnmounted(() => {
 
 <template>
   <div ref="containerRef" class="tl">
-
     <!-- Animated vertical line -->
     <div ref="lineTrackRef" class="tl__line-track">
       <div class="tl__line-fill" :style="{ height: progressHeight + 'px' }" />
@@ -93,7 +92,6 @@ onUnmounted(() => {
 
       <!-- ── Right: content card ────────────────────────────────── -->
       <div class="tl__card">
-
         <!-- Mobile title -->
         <div class="tl__mobile-header">
           <h3 class="tl__mobile-title">{{ item.title }}</h3>
@@ -102,7 +100,12 @@ onUnmounted(() => {
 
         <!-- Screenshot -->
         <div v-if="item.image" class="tl__image-wrap">
-          <img :src="item.image" :alt="item.imageAlt ?? item.title" class="tl__image" loading="lazy" />
+          <img
+            :src="item.image"
+            :alt="item.imageAlt ?? item.title"
+            class="tl__image"
+            loading="lazy"
+          />
           <div class="tl__image-overlay" />
         </div>
 
@@ -131,23 +134,31 @@ onUnmounted(() => {
             {{ item.linkLabel || 'Ver proyecto' }}
           </a>
         </div>
-
       </div>
     </div>
-
   </div>
 </template>
 
 <style lang="scss" scoped>
-
 @keyframes item-in {
-  from { opacity: 0; transform: translateY(40px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes dot-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
+  }
 }
 
 .tl {
@@ -163,8 +174,8 @@ onUnmounted(() => {
     background: linear-gradient(
       to bottom,
       transparent 0%,
-      rgba(255,255,255,0.06) 8%,
-      rgba(255,255,255,0.06) 92%,
+      rgba(255, 255, 255, 0.06) 8%,
+      rgba(255, 255, 255, 0.06) 92%,
       transparent 100%
     );
 
@@ -292,12 +303,17 @@ onUnmounted(() => {
     border: 1px solid $border-subtle;
     border-radius: 20px;
     overflow: hidden;
-    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      border-color 0.3s ease,
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
 
     &:hover {
       border-color: $border-violet;
       transform: translateY(-4px);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px $border-violet;
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        0 0 0 1px $border-violet;
     }
   }
 
@@ -344,11 +360,7 @@ onUnmounted(() => {
   &__image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      transparent 50%,
-      rgba(13, 13, 34, 0.85) 100%
-    );
+    background: linear-gradient(to bottom, transparent 50%, rgba(13, 13, 34, 0.85) 100%);
     pointer-events: none;
   }
 
@@ -432,7 +444,9 @@ onUnmounted(() => {
     width: fit-content;
     transition: all 0.25s ease;
 
-    i { font-size: 0.75rem; }
+    i {
+      font-size: 0.75rem;
+    }
 
     &:hover {
       background: $accent-primary;
