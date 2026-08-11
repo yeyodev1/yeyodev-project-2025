@@ -7,9 +7,7 @@ init()
 <template>
   <header class="header">
     <div class="header__container">
-      <a href="/" class="header__logo">
-        yeyo<span class="header__logo--dot">.</span>dev
-      </a>
+      <a href="/" class="header__logo"> yeyo<span class="header__logo--dot">.</span>dev </a>
 
       <nav class="header__nav">
         <a href="#projects">{{ t('nav.work') }}</a>
@@ -19,20 +17,27 @@ init()
 
       <div class="header__actions">
         <!-- Language toggle -->
-        <button class="header__lang" @click="toggle" :aria-label="isEs ? 'Switch to English' : 'Cambiar a Español'">
+        <button
+          class="header__lang"
+          @click="toggle"
+          :aria-label="isEs ? 'Switch to English' : 'Cambiar a Español'"
+        >
           <span class="header__lang-track" :class="{ 'header__lang-track--en': !isEs }">
             <span class="header__lang-thumb" />
           </span>
-          <span class="header__lang-label header__lang-label--es" :class="{ 'header__lang-label--active': isEs }">ES</span>
-          <span class="header__lang-label header__lang-label--en" :class="{ 'header__lang-label--active': !isEs }">EN</span>
+          <span
+            class="header__lang-label header__lang-label--es"
+            :class="{ 'header__lang-label--active': isEs }"
+            >ES</span
+          >
+          <span
+            class="header__lang-label header__lang-label--en"
+            :class="{ 'header__lang-label--active': !isEs }"
+            >EN</span
+          >
         </button>
 
-        <a
-          href="https://wa.me/17633524852"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="header__cta"
-        >
+        <a href="#contact" class="header__cta">
           {{ t('nav.letsTalk') }}
         </a>
       </div>
@@ -69,7 +74,9 @@ init()
     letter-spacing: -0.02em;
     flex-shrink: 0;
 
-    &--dot { color: $accent-primary; }
+    &--dot {
+      color: $accent-primary;
+    }
   }
 
   &__nav {
@@ -87,7 +94,9 @@ init()
       color: $text-secondary;
       text-decoration: none;
       transition: color 0.2s ease;
-      &:hover { color: $text-primary; }
+      &:hover {
+        color: $text-primary;
+      }
     }
   }
 
@@ -108,7 +117,9 @@ init()
     border-radius: 999px;
     padding: 0.3rem 0.5rem 0.3rem 0.4rem;
     cursor: pointer;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
     outline: none;
 
     &:hover {
@@ -139,7 +150,9 @@ init()
     height: 12px;
     border-radius: 50%;
     background: $accent-primary;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease;
+    transition:
+      transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+      background 0.3s ease;
 
     .header__lang-track--en & {
       transform: translateX(12px);
@@ -155,7 +168,9 @@ init()
     transition: color 0.25s ease;
     font-family: 'Roboto', sans-serif;
 
-    &--active { color: $text-primary; }
+    &--active {
+      color: $text-primary;
+    }
   }
 
   &__cta {
