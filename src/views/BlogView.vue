@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useLanguage } from '@/composables/useLanguage';
-import { useBlog } from '@/composables/useBlog';
-import BlogCard from '@/components/blog/BlogCard.vue';
-import BlogFilters from '@/components/blog/BlogFilters.vue';
-import BlogHero from '@/components/blog/BlogHero.vue';
+import { ref, computed, onMounted } from 'vue'
+import { useLanguage } from '@/composables/useLanguage'
+import { useBlog } from '@/composables/useBlog'
+import BlogCard from '@/components/blog/BlogCard.vue'
+import BlogFilters from '@/components/blog/BlogFilters.vue'
+import BlogHero from '@/components/blog/BlogHero.vue'
 
-const { t } = useLanguage();
+const { t } = useLanguage()
 const {
   posts,
   loading,
@@ -15,46 +15,46 @@ const {
   selectedCategory,
   searchQuery,
   filteredPosts,
-  fetchPosts
-} = useBlog();
+  fetchPosts,
+} = useBlog()
 
 // Estados locales para la vista
-const isVisible = ref(false);
-const viewMode = ref<'grid' | 'list'>('grid');
+const isVisible = ref(false)
+const viewMode = ref<'grid' | 'list'>('grid')
 
 // Computed properties
 const postsToShow = computed(() => {
-  return filteredPosts.value;
-});
+  return filteredPosts.value
+})
 
 const hasResults = computed(() => {
-  return postsToShow.value.length > 0;
-});
+  return postsToShow.value.length > 0
+})
 
 // Lifecycle
 onMounted(async () => {
-  await fetchPosts();
-  isVisible.value = true;
-});
+  await fetchPosts()
+  isVisible.value = true
+})
 
 // Métodos
 const handleCategoryChange = (category: string) => {
-  selectedCategory.value = category;
-};
+  selectedCategory.value = category
+}
 
 const handleSearchChange = (query: string) => {
-  searchQuery.value = query;
-};
+  searchQuery.value = query
+}
 
 const toggleViewMode = () => {
-  viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid';
-};
+  viewMode.value = viewMode.value === 'grid' ? 'list' : 'grid'
+}
 </script>
 
 <template>
   <div class="blog-view">
     <BlogHero />
-    
+
     <main class="blog-main">
       <div class="blog-container">
         <BlogFilters
@@ -66,12 +66,12 @@ const toggleViewMode = () => {
           @search-change="handleSearchChange"
           @view-mode-change="toggleViewMode"
         />
-        
+
         <div v-if="loading" class="blog-loading">
           <div class="loading-spinner"></div>
           <p>{{ t('blog.loading') }}</p>
         </div>
-        
+
         <!-- Error State -->
         <div v-else-if="error" class="blog-error">
           <div class="error-icon">⚠️</div>
@@ -81,22 +81,22 @@ const toggleViewMode = () => {
             {{ t('blog.error.retry') }}
           </button>
         </div>
-        
+
         <!-- No Results -->
         <div v-else-if="!hasResults" class="blog-empty">
           <div class="empty-icon">📝</div>
           <h3>{{ t('blog.empty.title') }}</h3>
           <p>{{ t('blog.empty.message') }}</p>
         </div>
-        
+
         <!-- Posts Grid/List -->
-        <div 
-          v-else 
+        <div
+          v-else
           class="blog-posts"
           :class="{
             'blog-posts--grid': viewMode === 'grid',
             'blog-posts--list': viewMode === 'list',
-            'blog-posts--visible': isVisible
+            'blog-posts--visible': isVisible,
           }"
         >
           <BlogCard
@@ -118,14 +118,14 @@ const toggleViewMode = () => {
 </template>
 
 <style lang="scss" scoped>
-
-
 .blog-view {
   min-height: 100vh;
-  background: linear-gradient(135deg,
-      $YEYO-VIOLET 0%,
-      rgba(26, 26, 46, 0.95) 20%,
-      rgba(22, 33, 62, 0.9) 100%);
+  background: linear-gradient(
+    135deg,
+    $YEYO-VIOLET 0%,
+    rgba(26, 26, 46, 0.95) 20%,
+    rgba(22, 33, 62, 0.9) 100%
+  );
 }
 
 .blog-main {
