@@ -1,61 +1,59 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useLanguage } from '@/composables/useLanguage';
-import type { BlogCategory } from '@/composables/useBlog';
+import { ref, computed } from 'vue'
+import { useLanguage } from '@/composables/useLanguage'
+import type { BlogCategory } from '@/composables/useBlog'
 
 interface Props {
-  categories: BlogCategory[];
-  selectedCategory: string;
-  searchQuery: string;
-  viewMode: 'grid' | 'list';
+  categories: BlogCategory[]
+  selectedCategory: string
+  searchQuery: string
+  viewMode: 'grid' | 'list'
 }
 
 interface Emits {
-  categoryChange: [category: string];
-  searchChange: [query: string];
-  viewModeChange: [mode: 'grid' | 'list'];
+  categoryChange: [category: string]
+  searchChange: [query: string]
+  viewModeChange: [mode: 'grid' | 'list']
 }
 
-const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const { t } = useLanguage();
+const { t } = useLanguage()
 
 // Estados locales
-const isSearchFocused = ref(false);
+const isSearchFocused = ref(false)
 
 // Computed properties
 const allCategories = computed(() => [
   { id: 'all', name: t('blog.filters.allCategories'), slug: 'all', description: '', count: 0 },
-  ...(props.categories || [])
-]);
+  ...(props.categories || []),
+])
 
 const hasActiveFilters = computed(() => {
-  return props.selectedCategory !== '' || props.searchQuery.trim() !== '';
-});
+  return props.selectedCategory !== '' || props.searchQuery.trim() !== ''
+})
 
 // Métodos
 const handleCategoryClick = (categorySlug: string) => {
-  const category = categorySlug === 'all' ? '' : categorySlug;
-  emit('categoryChange', category);
-};
+  const category = categorySlug === 'all' ? '' : categorySlug
+  emit('categoryChange', category)
+}
 
 const handleSearchInput = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  emit('searchChange', target.value);
-};
+  const target = event.target as HTMLInputElement
+  emit('searchChange', target.value)
+}
 
 const handleViewModeToggle = () => {
-  const newMode = props.viewMode === 'grid' ? 'list' : 'grid';
-  emit('viewModeChange', newMode);
-};
+  const newMode = props.viewMode === 'grid' ? 'list' : 'grid'
+  emit('viewModeChange', newMode)
+}
 
 const clearAllFilters = () => {
-  emit('categoryChange', '');
-  emit('searchChange', '');
-};
-
-
+  emit('categoryChange', '')
+  emit('searchChange', '')
+}
 </script>
 
 <template>
@@ -63,13 +61,16 @@ const clearAllFilters = () => {
     <!-- Barra principal de filtros -->
     <div class="blog-filters__main">
       <!-- Búsqueda -->
-      <div 
-        class="search-container"
-        :class="{ 'search-container--focused': isSearchFocused }"
-      >
+      <div class="search-container" :class="{ 'search-container--focused': isSearchFocused }">
         <div class="search-input-wrapper">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
           <input
             type="text"
@@ -79,40 +80,56 @@ const clearAllFilters = () => {
             @input="handleSearchInput"
             @focus="isSearchFocused = true"
             @blur="isSearchFocused = false"
-          >
-          <button 
+          />
+          <button
             v-if="searchQuery"
             @click="() => emit('searchChange', '')"
             class="search-clear"
             :aria-label="t('blog.filters.clearSearch')"
           >
             <svg viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path
+                d="M18 6L6 18M6 6L18 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
           </button>
         </div>
       </div>
-      
+
       <!-- Controles de vista (desktop) -->
       <div class="view-controls">
         <!-- Botón de vista -->
-        <button 
+        <button
           @click="handleViewModeToggle"
           class="view-toggle"
           :aria-label="t('blog.filters.toggleView')"
         >
           <svg v-if="viewMode === 'grid'" class="view-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M8 6H21M8 12H21M8 18H21M3 6H3.01M3 12H3.01M3 18H3.01"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
           <svg v-else class="view-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M3 3H10V10H3V3ZM14 3H21V10H14V3ZM14 14H21V21H14V14ZM3 14H10V21H3V14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M3 3H10V10H3V3ZM14 3H21V10H14V3ZM14 14H21V21H14V14ZM3 14H10V21H3V14Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
-        
-
       </div>
     </div>
-    
+
     <!-- Categorías (desktop) -->
     <div class="blog-filters__categories">
       <div class="categories-container">
@@ -122,9 +139,9 @@ const clearAllFilters = () => {
           @click="handleCategoryClick(category.slug)"
           class="category-button"
           :class="{
-            'category-button--active': 
+            'category-button--active':
               (category.slug === 'all' && selectedCategory === '') ||
-              (category.slug === selectedCategory)
+              category.slug === selectedCategory,
           }"
         >
           <span class="category-name">{{ category.name }}</span>
@@ -133,27 +150,25 @@ const clearAllFilters = () => {
           </span>
         </button>
       </div>
-      
+
       <!-- Limpiar filtros -->
-      <button 
-        v-if="hasActiveFilters"
-        @click="clearAllFilters"
-        class="clear-filters"
-      >
+      <button v-if="hasActiveFilters" @click="clearAllFilters" class="clear-filters">
         <svg class="clear-icon" viewBox="0 0 24 24" fill="none">
-          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path
+            d="M18 6L6 18M6 6L18 18"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
         <span>{{ t('blog.filters.clearAll') }}</span>
       </button>
     </div>
-    
-
   </div>
 </template>
 
 <style lang="scss" scoped>
-
-
 .blog-filters {
   position: sticky;
   top: 80px;
@@ -163,7 +178,7 @@ const clearAllFilters = () => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1.5rem 0;
   margin-bottom: 2rem;
-  
+
   &__main {
     max-width: 1200px;
     margin: 0 auto;
@@ -173,7 +188,7 @@ const clearAllFilters = () => {
     gap: 1rem;
     margin-bottom: 1rem;
   }
-  
+
   &__categories {
     max-width: 1200px;
     margin: 0 auto;
@@ -189,7 +204,7 @@ const clearAllFilters = () => {
 .search-container {
   flex: 1;
   max-width: 400px;
-  
+
   &--focused {
     .search-input-wrapper {
       border-color: #4facfe;
@@ -207,7 +222,7 @@ const clearAllFilters = () => {
   border-radius: 12px;
   padding: 0 1rem;
   transition: all 0.3s ease;
-  
+
   &:hover {
     border-color: rgba(255, 255, 255, 0.2);
   }
@@ -229,7 +244,7 @@ const clearAllFilters = () => {
   font-size: 1rem;
   padding: 1rem 0;
   outline: none;
-  
+
   &::placeholder {
     color: rgba(255, 255, 255, 0.5);
   }
@@ -243,12 +258,12 @@ const clearAllFilters = () => {
   padding: 0.25rem;
   border-radius: 4px;
   transition: all 0.2s ease;
-  
+
   svg {
     width: 16px;
     height: 16px;
   }
-  
+
   &:hover {
     color: white;
     background: rgba(255, 255, 255, 0.1);
@@ -274,12 +289,12 @@ const clearAllFilters = () => {
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.3s ease;
-  
+
   .view-icon {
     width: 20px;
     height: 20px;
   }
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
@@ -299,12 +314,12 @@ const clearAllFilters = () => {
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
-  
+
   .filter-icon {
     width: 18px;
     height: 18px;
   }
-  
+
   .active-indicator {
     position: absolute;
     top: -2px;
@@ -315,7 +330,7 @@ const clearAllFilters = () => {
     border-radius: 50%;
     border: 2px solid rgba(26, 26, 46, 0.95);
   }
-  
+
   &:hover,
   &--active {
     background: rgba(255, 255, 255, 0.1);
@@ -346,11 +361,11 @@ const clearAllFilters = () => {
   font-size: 0.875rem;
   font-weight: 500;
   white-space: nowrap;
-  
+
   .category-name {
     text-transform: capitalize;
   }
-  
+
   .category-count {
     background: rgba(255, 255, 255, 0.1);
     padding: 0.125rem 0.375rem;
@@ -358,19 +373,19 @@ const clearAllFilters = () => {
     font-size: 0.75rem;
     font-weight: 600;
   }
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(255, 255, 255, 0.2);
     color: white;
     transform: translateY(-1px);
   }
-  
+
   &--active {
     background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     border-color: transparent;
     color: white;
-    
+
     .category-count {
       background: rgba(255, 255, 255, 0.2);
     }
@@ -390,19 +405,17 @@ const clearAllFilters = () => {
   transition: all 0.3s ease;
   font-size: 0.875rem;
   font-weight: 500;
-  
+
   .clear-icon {
     width: 16px;
     height: 16px;
   }
-  
+
   &:hover {
     background: rgba(255, 107, 107, 0.2);
     border-color: rgba(255, 107, 107, 0.4);
   }
 }
-
-
 
 // Responsive Design
 @media (max-width: 768px) {
@@ -410,26 +423,26 @@ const clearAllFilters = () => {
     &__main {
       padding: 0 1rem;
     }
-    
+
     &__categories {
       padding: 0 1rem;
-      
+
       .categories-container {
         flex-wrap: wrap;
         gap: 0.5rem;
       }
     }
   }
-  
+
   .search-container {
     max-width: none;
   }
-  
+
   .category-button {
     font-size: 0.75rem;
     padding: 0.375rem 0.75rem;
   }
-  
+
   .mobile-filters-toggle {
     display: none;
   }
@@ -443,11 +456,11 @@ const clearAllFilters = () => {
       }
     }
   }
-  
+
   .category-button {
     font-size: 0.7rem;
     padding: 0.25rem 0.5rem;
-    
+
     .category-count {
       font-size: 0.65rem;
       padding: 0.125rem 0.25rem;
