@@ -14,7 +14,7 @@ const projectImages = import.meta.glob('@/assets/projects/*.(png|jpg|webp|PNG|JP
 }) as Record<string, string>
 
 function img(name: string): string | undefined {
-  const key = Object.keys(projectImages).find(k => k.includes(`/${name}.`))
+  const key = Object.keys(projectImages).find((k) => k.includes(`/${name}.`))
   return key ? projectImages[key] : undefined
 }
 
@@ -22,10 +22,10 @@ type FilterKey = 'all' | 'web' | 'saas' | 'ai'
 const activeFilter = ref<FilterKey>('all')
 
 const filters = computed(() => [
-  { key: 'all'  as FilterKey, label: t('projects.filters.all') },
-  { key: 'web'  as FilterKey, label: t('projects.filters.web') },
+  { key: 'all' as FilterKey, label: t('projects.filters.all') },
+  { key: 'web' as FilterKey, label: t('projects.filters.web') },
   { key: 'saas' as FilterKey, label: t('projects.filters.saas') },
-  { key: 'ai'   as FilterKey, label: t('projects.filters.ai') },
+  { key: 'ai' as FilterKey, label: t('projects.filters.ai') },
 ])
 
 type ProjectItem = TimelineEntry & { category: FilterKey }
@@ -33,62 +33,75 @@ type ProjectItem = TimelineEntry & { category: FilterKey }
 const allProjects = computed<ProjectItem[]>(() => [
   {
     category: 'saas',
-    title:     t('projects.items.finestra.title'),
-    content:   t('projects.items.finestra.content'),
-    tags:      ['Vue.js', 'Node.js', 'MongoDB', 'Contifico API', 'Real-time', 'Warehouse'],
-    badge:     t('projects.items.finestra.badge'),
-    link:      'https://nicole-sells-bills.netlify.app/',
+    title: t('projects.items.finestra.title'),
+    content: t('projects.items.finestra.content'),
+    tags: ['Vue.js', 'Node.js', 'MongoDB', 'Contifico API', 'Real-time', 'Warehouse'],
+    badge: t('projects.items.finestra.badge'),
+    link: 'https://nicole-sells-bills.netlify.app/',
     linkLabel: t('projects.items.finestra.linkLabel'),
-    image:     img('finestra'),
-    imageAlt:  'Finestra — Nicole Pastry Arts SaaS dashboard',
+    image: img('finestra'),
+    imageAlt: 'Finestra — Nicole Pastry Arts SaaS dashboard',
   },
   {
     category: 'web',
-    title:     t('projects.items.bakano.title'),
-    content:   t('projects.items.bakano.content'),
-    tags:      ['Vue.js', 'SCSS', 'Node.js', 'Data Strategy', 'Tech Leadership'],
-    badge:     t('projects.items.bakano.badge'),
-    link:      'https://bakano.ec/',
+    title: t('projects.items.bakano.title'),
+    content: t('projects.items.bakano.content'),
+    tags: ['Vue.js', 'SCSS', 'Node.js', 'Data Strategy', 'Tech Leadership'],
+    badge: t('projects.items.bakano.badge'),
+    link: 'https://bakano.ec/',
     linkLabel: t('projects.items.bakano.linkLabel'),
-    image:     img('bakano'),
-    imageAlt:  'Bakano — Digital Agency website',
+    image: img('bakano'),
+    imageAlt: 'Bakano — Digital Agency website',
   },
   {
     category: 'web',
-    title:     t('projects.items.opus.title'),
-    content:   t('projects.items.opus.content'),
-    tags:      ['Vue.js', 'Vite', 'SCSS', 'SEO', 'Netlify'],
-    badge:     t('projects.items.opus.badge'),
-    link:      'https://opusdentallab.info/',
+    title: t('projects.items.opus.title'),
+    content: t('projects.items.opus.content'),
+    tags: ['Vue.js', 'Vite', 'SCSS', 'SEO', 'Netlify'],
+    badge: t('projects.items.opus.badge'),
+    link: 'https://opusdentallab.info/',
     linkLabel: t('projects.items.opus.linkLabel'),
-    image:     img('opus'),
-    imageAlt:  'Opus Dental Lab website',
+    image: img('opus'),
+    imageAlt: 'Opus Dental Lab website',
+  },
+  {
+    category: 'web',
+    title: t('projects.items.courierbox.title'),
+    content: t('projects.items.courierbox.content'),
+    tags: ['WordPress', 'SEO', 'Responsive', 'UI/UX'],
+    badge: t('projects.items.courierbox.badge'),
+    link: 'https://courierboxlogistics.com/',
+    linkLabel: t('projects.items.courierbox.linkLabel'),
+    image: img('courierbox'),
+    imageAlt: 'Courier Box — Logistics Courier website',
   },
   {
     category: 'ai',
-    title:     t('projects.items.scaleai.title'),
-    content:   t('projects.items.scaleai.content'),
-    tags:      ['Python', 'TypeScript', 'AI Training', 'RLHF', 'Data Pipelines', 'Scale AI'],
-    badge:     t('projects.items.scaleai.badge'),
-    image:     img('scale'),
-    imageAlt:  'Scale AI — scale.com website',
+    title: t('projects.items.scaleai.title'),
+    content: t('projects.items.scaleai.content'),
+    tags: ['Python', 'TypeScript', 'AI Training', 'RLHF', 'Data Pipelines', 'Scale AI'],
+    badge: t('projects.items.scaleai.badge'),
+    image: img('scale'),
+    imageAlt: 'Scale AI — scale.com website',
   },
 ])
 
 const displayed = computed<TimelineEntry[]>(() => {
-  const list = activeFilter.value === 'all'
-    ? allProjects.value
-    : allProjects.value.filter(p => p.category === activeFilter.value)
+  const list =
+    activeFilter.value === 'all'
+      ? allProjects.value
+      : allProjects.value.filter((p) => p.category === activeFilter.value)
   return list.map(({ category: _c, ...rest }) => rest)
 })
 
-const setFilter = (key: FilterKey) => { activeFilter.value = key }
+const setFilter = (key: FilterKey) => {
+  activeFilter.value = key
+}
 </script>
 
 <template>
   <section id="projects" class="projects">
     <div class="projects__container">
-
       <!-- Header -->
       <div class="projects__header">
         <span class="projects__eyebrow">{{ t('projects.eyebrow') }}</span>
@@ -107,7 +120,9 @@ const setFilter = (key: FilterKey) => { activeFilter.value = key }
           class="projects__filter"
           :class="{ 'projects__filter--active': activeFilter === f.key }"
           @click="setFilter(f.key)"
-        >{{ f.label }}</button>
+        >
+          {{ f.label }}
+        </button>
       </div>
 
       <!-- Timeline -->
@@ -118,25 +133,24 @@ const setFilter = (key: FilterKey) => { activeFilter.value = key }
       <!-- CTA -->
       <div class="projects__cta">
         <p>{{ t('projects.cta.text') }}</p>
-        <a
-          href="https://wa.me/17633524852"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="projects__cta-btn"
-        >
+        <a href="#contact" class="projects__cta-btn">
           {{ t('projects.cta.btn') }}
         </a>
       </div>
-
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .projects {
@@ -148,7 +162,9 @@ const setFilter = (key: FilterKey) => { activeFilter.value = key }
     margin: 0 auto;
     padding: 0 1.5rem;
 
-    @media (min-width: $breakpoint-md) { padding: 0 2rem; }
+    @media (min-width: $breakpoint-md) {
+      padding: 0 2rem;
+    }
   }
 
   &__header {
@@ -258,7 +274,12 @@ const setFilter = (key: FilterKey) => { activeFilter.value = key }
 }
 
 .fade-list-enter-active,
-.fade-list-leave-active { transition: all 0.3s ease; }
+.fade-list-leave-active {
+  transition: all 0.3s ease;
+}
 .fade-list-enter-from,
-.fade-list-leave-to     { opacity: 0; transform: translateY(16px); }
+.fade-list-leave-to {
+  opacity: 0;
+  transform: translateY(16px);
+}
 </style>
