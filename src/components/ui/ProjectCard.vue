@@ -4,41 +4,45 @@ import { computed } from 'vue'
 const props = defineProps({
   title: {
     type: String,
-    required: true
+    required: true,
   },
   content: {
     type: String,
-    required: true
+    required: true,
   },
   tags: {
     type: Array as () => string[],
     required: false,
-    default: () => []
+    default: () => [],
   },
   badge: {
     type: String,
-    required: false
+    required: false,
   },
   link: {
     type: String,
-    required: false
+    required: false,
   },
   linkLabel: {
     type: String,
-    required: false
+    required: false,
   },
   category: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 })
 
 const categoryIcon = computed(() => {
   switch (props.category) {
-    case 'web': return 'fa-solid fa-globe'
-    case 'saas': return 'fa-solid fa-server'
-    case 'ai': return 'fa-solid fa-microchip'
-    default: return 'fa-solid fa-code'
+    case 'web':
+      return 'fa-solid fa-globe'
+    case 'saas':
+      return 'fa-solid fa-server'
+    case 'ai':
+      return 'fa-solid fa-microchip'
+    default:
+      return 'fa-solid fa-code'
   }
 })
 </script>
@@ -67,12 +71,12 @@ const categoryIcon = computed(() => {
         </span>
         <span v-if="tags.length > 4" class="project-card__tag-more">+{{ tags.length - 4 }}</span>
       </div>
-      
-      <a 
-        v-if="link" 
-        :href="link" 
-        target="_blank" 
-        rel="noopener noreferrer" 
+
+      <a
+        v-if="link"
+        :href="link"
+        target="_blank"
+        rel="noopener noreferrer"
         class="project-card__link"
       >
         {{ linkLabel || 'View Project' }}
@@ -107,7 +111,9 @@ const categoryIcon = computed(() => {
   &:hover {
     transform: translateY(-6px);
     border-color: $border-violet;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px $accent-glow;
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.4),
+      0 0 20px $accent-glow;
 
     &::before {
       opacity: 1;
