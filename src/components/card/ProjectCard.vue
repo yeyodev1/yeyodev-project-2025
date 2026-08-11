@@ -16,7 +16,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
-});
+})
 </script>
 
 <template>
@@ -36,8 +36,6 @@ const props = defineProps({
 </template>
 
 <style lang="scss" scoped>
-
-
 .card {
   display: block;
   background-color: $white;
@@ -45,7 +43,9 @@ const props = defineProps({
   color: $YEYO-BLUE;
   border-radius: 4px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 
   // Sutil sombra para dar profundidad
   box-shadow: 0 2px 10px rgba($YEYO-VIOLET, 0.05);
