@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useLanguage } from '@/composables/useLanguage';
+import { ref, onMounted, computed } from 'vue'
+import { useLanguage } from '@/composables/useLanguage'
 
-const { t } = useLanguage();
+const { t } = useLanguage()
 
 // Lógica del Intersection Observer para la animación al hacer scroll
-const sectionContainer = ref<HTMLElement | null>(null);
-const isVisible = ref(false);
-const mousePosition = ref({ x: 0, y: 0 });
+const sectionContainer = ref<HTMLElement | null>(null)
+const isVisible = ref(false)
+const mousePosition = ref({ x: 0, y: 0 })
 
 // Datos de habilidades y logros
 const achievements = computed(() => [
   { number: '50+', label: t('about.achievements.projects'), icon: '🚀' },
   { number: '3+', label: t('about.achievements.experience'), icon: '⏰' },
   { number: '15+', label: t('about.achievements.technologies'), icon: '💻' },
-  { number: '100%', label: t('about.achievements.dedication'), icon: '❤️' }
-]);
+  { number: '100%', label: t('about.achievements.dedication'), icon: '❤️' },
+])
 
 const skills = computed(() => [
   t('about.skills.architecture'),
@@ -23,36 +23,36 @@ const skills = computed(() => [
   t('about.skills.agile'),
   t('about.skills.leadership'),
   t('about.skills.performance'),
-  t('about.skills.testing')
-]);
+  t('about.skills.testing'),
+])
 
 // Manejo del mouse para efectos parallax
 const handleMouseMove = (event: MouseEvent) => {
-  const rect = sectionContainer.value?.getBoundingClientRect();
+  const rect = sectionContainer.value?.getBoundingClientRect()
   if (rect) {
     mousePosition.value = {
       x: (event.clientX - rect.left) / rect.width,
-      y: (event.clientY - rect.top) / rect.height
-    };
+      y: (event.clientY - rect.top) / rect.height,
+    }
   }
-};
+}
 
 onMounted(() => {
   const observer = new IntersectionObserver(
     ([entry]) => {
       if (entry && entry.isIntersecting) {
-        isVisible.value = true;
-        observer.unobserve(sectionContainer.value as Element);
+        isVisible.value = true
+        observer.unobserve(sectionContainer.value as Element)
       }
     },
-    { threshold: 0.2 }
-  );
+    { threshold: 0.2 },
+  )
 
   if (sectionContainer.value) {
-    observer.observe(sectionContainer.value);
-    sectionContainer.value.addEventListener('mousemove', handleMouseMove);
+    observer.observe(sectionContainer.value)
+    sectionContainer.value.addEventListener('mousemove', handleMouseMove)
   }
-});
+})
 </script>
 
 <template>
@@ -74,7 +74,9 @@ onMounted(() => {
       <div class="about__header">
         <h2 class="about__title">
           <span class="about__title-line">{{ t('about.title') }}</span>
-          <span class="about__title-line about__title-line--accent">{{ t('about.titleAccent') }}</span>
+          <span class="about__title-line about__title-line--accent">{{
+            t('about.titleAccent')
+          }}</span>
         </h2>
         <div class="about__title-decoration"></div>
       </div>
@@ -94,8 +96,8 @@ onMounted(() => {
             <div class="about__skills">
               <h3 class="about__skills-title">Especialidades</h3>
               <div class="about__skills-grid">
-                <div 
-                  v-for="(skill, index) in skills" 
+                <div
+                  v-for="(skill, index) in skills"
                   :key="skill"
                   class="about__skill-tag"
                   :style="{ '--skill-delay': index }"
@@ -111,11 +113,7 @@ onMounted(() => {
         <div class="about__visual-section">
           <div class="about__image-container">
             <div class="about__image-frame">
-              <img 
-                src="../../assets/fotos/yo.jpg" 
-                alt="Retrato de Diego Reyes" 
-                class="about__image"
-              />
+              <img src="@/assets/fotos/yo.jpg" alt="Retrato de Diego Reyes" class="about__image" />
               <div class="about__image-overlay"></div>
             </div>
             <div class="about__image-decoration">
@@ -129,8 +127,8 @@ onMounted(() => {
       <!-- Sección de logros -->
       <div class="about__achievements">
         <div class="about__achievements-grid">
-          <div 
-            v-for="(achievement, index) in achievements" 
+          <div
+            v-for="(achievement, index) in achievements"
             :key="achievement.label"
             class="about__achievement-card"
             :style="{ '--achievement-delay': index }"
@@ -141,16 +139,45 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Galería de fotos -->
+      <div class="about__gallery">
+        <div class="about__gallery-track">
+          <div class="about__gallery-item">
+            <img
+              src="@/assets/fotos/DSC06674.jpg"
+              alt="Diego Reyes"
+              class="about__gallery-img"
+              loading="lazy"
+            />
+          </div>
+          <div class="about__gallery-item">
+            <img
+              src="@/assets/fotos/DSC06685.jpg"
+              alt="Diego Reyes"
+              class="about__gallery-img"
+              loading="lazy"
+            />
+          </div>
+          <div class="about__gallery-item">
+            <img
+              src="@/assets/fotos/DSC07008.jpg"
+              alt="Diego Reyes"
+              class="about__gallery-img"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-
-
 // Animaciones sofisticadas
 @keyframes float-gentle {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px) rotate(0deg);
   }
   50% {
@@ -159,7 +186,11 @@ onMounted(() => {
 }
 
 @keyframes bounce-gentle {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0) scale(1);
   }
   40% {
@@ -171,7 +202,8 @@ onMounted(() => {
 }
 
 @keyframes bounce-rotate {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg) scale(1);
   }
   25% {
@@ -207,7 +239,8 @@ onMounted(() => {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
   }
   50% {
@@ -278,19 +311,25 @@ onMounted(() => {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 // Estilos principales
 .about {
   padding: 8rem 1.5rem;
-  background: linear-gradient(135deg, 
-    $YEYO-VIOLET 0%, 
-    rgba(26, 26, 46, 0.95) 20%, 
-    rgba(22, 33, 62, 0.9) 40%, 
-    rgba(15, 52, 96, 0.85) 60%, 
-    rgba(34, 34, 59, 0.8) 80%, 
+  background: linear-gradient(
+    135deg,
+    $YEYO-VIOLET 0%,
+    rgba(26, 26, 46, 0.95) 20%,
+    rgba(22, 33, 62, 0.9) 40%,
+    rgba(15, 52, 96, 0.85) 60%,
+    rgba(34, 34, 59, 0.8) 80%,
     rgba(34, 34, 59, 0.8) 100%
   );
   background-size: 400% 400%;
@@ -369,7 +408,7 @@ onMounted(() => {
     right: 20%;
     animation: bounce-gentle 4s ease-in-out infinite;
     animation-delay: 1s;
-    
+
     &:hover {
       border-bottom-color: rgba(79, 172, 254, 0.6);
       animation-play-state: paused;
@@ -386,7 +425,7 @@ onMounted(() => {
     animation: bounce-rotate 6s ease-in-out infinite;
     animation-delay: 3s;
     border-radius: 2px;
-    
+
     &:hover {
       background: rgba(79, 172, 254, 0.7);
       animation-play-state: paused;
@@ -403,7 +442,7 @@ onMounted(() => {
     left: 70%;
     animation: bounce-elastic 5s ease-in-out infinite;
     animation-delay: 5s;
-    
+
     &:hover {
       background: rgba(0, 242, 254, 0.8);
       animation-play-state: paused;
@@ -778,5 +817,56 @@ onMounted(() => {
   font-weight: 600;
   opacity: 0.9;
   line-height: 1.4;
+}
+
+// ── Photo Gallery ───────────────────────────────────────────────────────────
+.about__gallery {
+  margin-top: 4rem;
+  opacity: 0;
+
+  .about.is-visible & {
+    animation: slide-in-up 1s ease-out 1.6s forwards;
+  }
+}
+
+.about__gallery-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+.about__gallery-item {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid $border-subtle;
+  transition: all 0.4s ease;
+  aspect-ratio: 3 / 4;
+
+  &:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: $border-violet;
+    box-shadow:
+      0 12px 30px rgba(0, 0, 0, 0.4),
+      0 0 20px $accent-glow;
+  }
+}
+
+.about__gallery-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+
+  .about__gallery-item:hover & {
+    transform: scale(1.05);
+  }
 }
 </style>
