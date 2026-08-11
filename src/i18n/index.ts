@@ -26,7 +26,8 @@ const es = {
     eyebrow: 'Portafolio',
     title: 'Trabajo',
     titleAccent: 'Seleccionado',
-    subtitle: 'Sistemas construidos desde cero — entendiendo el problema primero, luego escribiendo cada línea.',
+    subtitle:
+      'Sistemas construidos desde cero — entendiendo el problema primero, luego escribiendo cada línea.',
     filters: {
       all: 'Todos',
       web: 'Web & Marketing',
@@ -38,28 +39,40 @@ const es = {
         title: 'Finestra — Nicole Pastry Arts',
         duration: 'SaaS personalizado · En producción',
         badge: 'En vivo · Producción',
-        content: 'Sistema de gestión de pedidos de extremo a extremo construido para Finestra, empresa que opera tres restaurantes: Casa Mía, Delacrem y Nicole Pastry Arts. Construido observando el flujo de trabajo real del equipo — desde que se realiza un pedido, pasando por producción, despacho, entrega e inventario en tiempo real. Integrado con el sistema de facturación Contifico.',
+        content:
+          'Sistema de gestión de pedidos de extremo a extremo construido para Finestra, empresa que opera tres restaurantes: Casa Mía, Delacrem y Nicole Pastry Arts. Construido observando el flujo de trabajo real del equipo — desde que se realiza un pedido, pasando por producción, despacho, entrega e inventario en tiempo real. Integrado con el sistema de facturación Contifico.',
         linkLabel: 'Ver sistema',
       },
       bakano: {
         title: 'Bakano — Agencia Digital',
         duration: '3 días · Build del CTO',
         badge: 'CTO · Full Stack',
-        content: 'Como CTO y desarrollador fundador de Bakano, lideré la arquitectura y desarrollo del sitio web propio de la agencia y las herramientas internas. Bakano impulsa marketing de crecimiento, estrategia de datos, rendimiento en Meta Ads y consultoría tecnológica para más de 150 empresas en Ecuador.',
+        content:
+          'Como CTO y desarrollador fundador de Bakano, lideré la arquitectura y desarrollo del sitio web propio de la agencia y las herramientas internas. Bakano impulsa marketing de crecimiento, estrategia de datos, rendimiento en Meta Ads y consultoría tecnológica para más de 150 empresas en Ecuador.',
         linkLabel: 'Visitar bakano.ec',
       },
       opus: {
         title: 'Opus Dental Lab',
         duration: '5 días · entrega completa',
         badge: 'Completado',
-        content: 'Sitio web completo para Opus Dental Lab LLC, un laboratorio dental en Orlando, FL. Entregado en 5 días — desde el diseño hasta el despliegue. Limpio, profesional y optimizado para SEO.',
+        content:
+          'Sitio web completo para Opus Dental Lab LLC, un laboratorio dental en Orlando, FL. Entregado en 5 días — desde el diseño hasta el despliegue. Limpio, profesional y optimizado para SEO.',
+        linkLabel: 'Visitar sitio',
+      },
+      courierbox: {
+        title: 'Courier Box — Logística Courier',
+        duration: 'Web corporativa · En producción',
+        badge: 'En vivo · Producción',
+        content:
+          'Plataforma web corporativa para Courier Box, empresa de logística y mensajería. Sitio moderno con diseño responsivo, optimización SEO, y una experiencia de usuario fluida que refleja la velocidad y confiabilidad de su servicio. Construido con foco en conversión y presencia profesional.',
         linkLabel: 'Visitar sitio',
       },
       scaleai: {
         title: 'Scale AI — Entrenamiento GPT-3 & GPT-3.5',
         duration: 'Mar 2024 – Ene 2025',
         badge: 'Equipo Pionero · IA',
-        content: 'Parte de uno de los primeros equipos de entrenadores de IA en Scale AI, contribuyendo con los conjuntos de datos y muestras de código que ayudaron a dar forma a GPT-3 y GPT-3.5. Escribí código original en Python, JavaScript y TypeScript para alimentar los modelos — nada copiado, toda lógica artesanal. También construí herramientas de evaluación, curé conjuntos de datos y optimicé pipelines de datos.',
+        content:
+          'Parte de uno de los primeros equipos de entrenadores de IA en Scale AI, contribuyendo con los conjuntos de datos y muestras de código que ayudaron a dar forma a GPT-3 y GPT-3.5. Escribí código original en Python, JavaScript y TypeScript para alimentar los modelos — nada copiado, toda lógica artesanal. También construí herramientas de evaluación, curé conjuntos de datos y optimicé pipelines de datos.',
         linkLabel: '',
       },
     },
@@ -72,7 +85,8 @@ const es = {
     eyebrow: 'Lo que hago',
     title: 'Servicios',
     titleAccent: 'y Expertise',
-    subtitle: '6 años construyendo productos en Ecuador, Perú, España y EE.UU. Traigo tanto la visión técnica como la empresarial.',
+    subtitle:
+      '6 años construyendo productos en Ecuador, Perú, España y EE.UU. Traigo tanto la visión técnica como la empresarial.',
     items: [
       {
         icon: 'fa-solid fa-bolt',
@@ -129,7 +143,8 @@ const es = {
     subtitle: 'Leo los negocios como código. Cuéntame qué necesitas — yo descifraré el resto.',
     info: {
       role: 'CTO · Full Stack Dev · Entrenador IA',
-      based: 'Basado en Ecuador · disponible en todo el mundo. Normalmente respondo en pocas horas.',
+      based:
+        'Basado en Ecuador · disponible en todo el mundo. Normalmente respondo en pocas horas.',
       availability: 'Disponible para nuevos proyectos',
     },
     socials: {
@@ -139,8 +154,10 @@ const es = {
       email: 'Email',
     },
     form: {
-      name: 'Nombre completo *',
-      namePlaceholder: 'Ana García',
+      firstName: 'Nombre *',
+      firstNamePlaceholder: 'Ana',
+      lastName: 'Apellido *',
+      lastNamePlaceholder: 'García',
       email: 'Email *',
       emailPlaceholder: 'ana@empresa.com',
       company: 'Empresa / Nombre del proyecto',
@@ -149,15 +166,55 @@ const es = {
       projectTypePlaceholder: 'Selecciona uno…',
       budget: 'Rango de presupuesto',
       budgetPlaceholder: 'Selecciona rango…',
+      phone: 'Teléfono *',
+      phonePlaceholder: '+57 300 123 4567',
+      timeline: '¿Cuándo necesitas empezar? *',
+      timelinePlaceholder: 'Selecciona un plazo…',
+      referralSource: '¿Cómo me encontraste?',
+      referralSourcePlaceholder: 'Selecciona…',
       message: 'Cuéntame sobre tu proyecto *',
-      messagePlaceholder: 'Describe qué necesitas, el problema que estás resolviendo, o qué te entusiasma de este proyecto…',
+      messagePlaceholder:
+        'Describe qué necesitas, el problema que estás resolviendo, o qué te entusiasma de este proyecto…',
       submit: 'Enviar mensaje →',
-      projectTypes: ['App Web Full Stack', 'SaaS personalizado / Sistema', 'Sitio Corporativo', 'Integración de IA', 'Consultoría Tech / CTO', 'Otro'],
-      budgets: ['Menos de $1,000', '$1,000 – $5,000', '$5,000 – $15,000', '$15,000+', 'Lo discutimos'],
+      projectTypes: [
+        'Tienda en línea / E-commerce',
+        'Sitio web corporativo',
+        'Sitio web informativo / Landing page',
+        'App personalizada / SaaS',
+        'Academia / Plataforma educativa',
+        'Integración de IA y automatización',
+        'Consultoría Tech / CTO como servicio',
+        'App Web Full Stack',
+        'Otro',
+      ],
+      budgets: [
+        'Menos de $1,000',
+        '$1,000 – $5,000',
+        '$5,000 – $15,000',
+        '$15,000+',
+        'Lo discutimos',
+      ],
+      timelines: [
+        'Lo antes posible',
+        'Este mes',
+        '1-3 meses',
+        '3+ meses',
+        'Aún lo estoy evaluando',
+      ],
+      referralSources: [
+        'Google',
+        'WhatsApp',
+        'Instagram',
+        'LinkedIn',
+        'Recomendación',
+        'X / Twitter',
+        'Otro',
+      ],
     },
     success: {
       title: '¡Mensaje recibido!',
-      text: 'Gracias por escribir. Me pondré en contacto pronto.',
+      text: 'Gracias por escribir. Ahora envíame un WhatsApp para confirmar tu solicitud y hablar directo:',
+      whatsappCta: 'Enviar por WhatsApp →',
     },
   },
   github: {
@@ -218,7 +275,8 @@ const en = {
     eyebrow: 'Portfolio',
     title: 'Selected',
     titleAccent: 'Work',
-    subtitle: 'Systems built from scratch — understanding the problem first, then writing every line.',
+    subtitle:
+      'Systems built from scratch — understanding the problem first, then writing every line.',
     filters: {
       all: 'All',
       web: 'Web & Marketing',
@@ -230,28 +288,40 @@ const en = {
         title: 'Finestra — Nicole Pastry Arts',
         duration: 'Custom SaaS · Ongoing',
         badge: 'Live · Production',
-        content: "End-to-end order management system built for Finestra, a company operating three restaurants: Casa Mía, Delacrem & Nicole Pastry Arts. Built by observing the team's real workflow — from the moment an order is placed, through production, dispatch, delivery, and warehouse inventory in real time. Integrated with Contifico billing system.",
+        content:
+          "End-to-end order management system built for Finestra, a company operating three restaurants: Casa Mía, Delacrem & Nicole Pastry Arts. Built by observing the team's real workflow — from the moment an order is placed, through production, dispatch, delivery, and warehouse inventory in real time. Integrated with Contifico billing system.",
         linkLabel: 'View system',
       },
       bakano: {
         title: 'Bakano — Digital Agency',
         duration: '3 days · CTO build',
         badge: 'CTO · Full Stack',
-        content: "As CTO and founding developer of Bakano, led the architecture and development of the agency's own website and internal tooling. Bakano powers growth marketing, data strategy, Meta Ads performance, and tech consulting for 150+ businesses across Ecuador.",
+        content:
+          "As CTO and founding developer of Bakano, led the architecture and development of the agency's own website and internal tooling. Bakano powers growth marketing, data strategy, Meta Ads performance, and tech consulting for 150+ businesses across Ecuador.",
         linkLabel: 'Visit bakano.ec',
       },
       opus: {
         title: 'Opus Dental Lab',
         duration: '5 days · full delivery',
         badge: 'Completed',
-        content: 'Full website for Opus Dental Lab LLC, a dental laboratory based in Orlando, FL. Delivered in 5 days — from design to deployment. Clean, professional, SEO-ready.',
+        content:
+          'Full website for Opus Dental Lab LLC, a dental laboratory based in Orlando, FL. Delivered in 5 days — from design to deployment. Clean, professional, SEO-ready.',
+        linkLabel: 'Visit site',
+      },
+      courierbox: {
+        title: 'Courier Box — Logistics Courier',
+        duration: 'Corporate web · In production',
+        badge: 'Live · Production',
+        content:
+          'Corporate web platform for Courier Box, a logistics and courier company. Modern site with responsive design, SEO optimization, and a smooth user experience that reflects the speed and reliability of their service. Built with a focus on conversion and professional presence.',
         linkLabel: 'Visit site',
       },
       scaleai: {
         title: 'Scale AI — GPT-3 & GPT-3.5 Training',
         duration: 'Mar 2024 – Jan 2025',
         badge: 'Early Team · AI',
-        content: 'Part of one of the earliest AI trainer teams at Scale AI, contributing to the datasets and code samples that helped shape GPT-3 and GPT-3.5. Wrote original Python, JavaScript and TypeScript code to feed the models — no copy-pasted snippets, all crafted logic. Also built evaluation tools, curated datasets and optimized data pipelines.',
+        content:
+          'Part of one of the earliest AI trainer teams at Scale AI, contributing to the datasets and code samples that helped shape GPT-3 and GPT-3.5. Wrote original Python, JavaScript and TypeScript code to feed the models — no copy-pasted snippets, all crafted logic. Also built evaluation tools, curated datasets and optimized data pipelines.',
         linkLabel: '',
       },
     },
@@ -264,7 +334,8 @@ const en = {
     eyebrow: 'What I do',
     title: 'Services &',
     titleAccent: 'Expertise',
-    subtitle: '6 years building products across Ecuador, Peru, Spain and the US. I bring both the engineering and the business eye.',
+    subtitle:
+      '6 years building products across Ecuador, Peru, Spain and the US. I bring both the engineering and the business eye.',
     items: [
       {
         icon: 'fa-solid fa-bolt',
@@ -276,7 +347,7 @@ const en = {
       {
         icon: 'fa-solid fa-diagram-project',
         title: 'Business Logic → Software',
-        desc: "My edge: I map your entire workflow by observing how your team works, then I turn that into a system. No bloated specs, just working software.",
+        desc: 'My edge: I map your entire workflow by observing how your team works, then I turn that into a system. No bloated specs, just working software.',
         tags: ['Systems Design', 'Process Mapping', 'Custom SaaS'],
         highlight: true,
       },
@@ -290,7 +361,7 @@ const en = {
       {
         icon: 'fa-solid fa-microchip',
         title: 'AI Integration',
-        desc: "Integrate AI into your product: chatbots, automation, data pipelines, and more. Trained models at Scale AI — I know how the sausage is made.",
+        desc: 'Integrate AI into your product: chatbots, automation, data pipelines, and more. Trained models at Scale AI — I know how the sausage is made.',
         tags: ['AI Tools', 'LLM Integration', 'Automation', 'Data Pipelines'],
         highlight: false,
       },
@@ -331,8 +402,10 @@ const en = {
       email: 'Email',
     },
     form: {
-      name: 'Full Name *',
-      namePlaceholder: 'Jane Smith',
+      firstName: 'First Name *',
+      firstNamePlaceholder: 'Jane',
+      lastName: 'Last Name *',
+      lastNamePlaceholder: 'Smith',
       email: 'Email *',
       emailPlaceholder: 'jane@company.com',
       company: 'Company / Project name',
@@ -341,15 +414,49 @@ const en = {
       projectTypePlaceholder: 'Select one…',
       budget: 'Budget range',
       budgetPlaceholder: 'Select range…',
+      phone: 'Phone *',
+      phonePlaceholder: '+1 305 123 4567',
+      timeline: 'When do you need to start? *',
+      timelinePlaceholder: 'Select a timeline…',
+      referralSource: 'How did you find me?',
+      referralSourcePlaceholder: 'Select…',
       message: 'Tell me about your project *',
-      messagePlaceholder: "Describe what you need, the problem you're solving, or what excites you about this project…",
+      messagePlaceholder:
+        "Describe what you need, the problem you're solving, or what excites you about this project…",
       submit: 'Send message →',
-      projectTypes: ['Full Stack Web App', 'Custom SaaS / System', 'Corporate Website', 'AI Integration', 'Tech Consulting / CTO', 'Other'],
+      projectTypes: [
+        'Online Store / E-commerce',
+        'Corporate Website',
+        'Informational Website / Landing Page',
+        'Custom App / SaaS',
+        'Online Academy / Learning Platform',
+        'AI Integration & Automation',
+        'Tech Consulting / CTO as a Service',
+        'Full Stack Web App',
+        'Other',
+      ],
       budgets: ['Under $1,000', '$1,000 – $5,000', '$5,000 – $15,000', '$15,000+', "Let's discuss"],
+      timelines: [
+        'As soon as possible',
+        'This month',
+        '1-3 months',
+        '3+ months',
+        'Still evaluating',
+      ],
+      referralSources: [
+        'Google',
+        'WhatsApp',
+        'Instagram',
+        'LinkedIn',
+        'Referral',
+        'X / Twitter',
+        'Other',
+      ],
     },
     success: {
       title: 'Message received!',
-      text: "Thanks for reaching out. I'll get back to you shortly.",
+      text: "Thanks! Now send me a WhatsApp to confirm your request and let's talk directly:",
+      whatsappCta: 'Send via WhatsApp →',
     },
   },
   github: {
