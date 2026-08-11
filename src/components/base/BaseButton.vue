@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const props = defineProps({
   variant: {
@@ -8,11 +8,11 @@ const props = defineProps({
   },
   href: {
     type: String,
-    default: null
+    default: null,
   },
-});
+})
 
-const componentTag = computed(() => (props.href ? 'a' : 'button'));
+const componentTag = computed(() => (props.href ? 'a' : 'button'))
 </script>
 
 <template>
@@ -22,8 +22,6 @@ const componentTag = computed(() => (props.href ? 'a' : 'button'));
 </template>
 
 <style lang="scss" scoped>
-
-
 .button {
   display: inline-block;
   padding: 0.75rem 1.75rem;
