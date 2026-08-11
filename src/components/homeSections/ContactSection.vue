@@ -1,37 +1,191 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import BaseSelect from '@/components/base/BaseSelect.vue'
 
 const { t, tm } = useI18n()
 
+const WEBHOOK_URL = import.meta.env.VITE_CONTACT_WEBHOOK as string | undefined
+const QUALIFICATION_WEBHOOK = import.meta.env.VITE_QUALIFICATION_WEBHOOK as string | undefined
+
 interface FormData {
-  name: string
+  firstName: string
+  lastName: string
   email: string
+  phone: string
   company: string
-  budget: string
   projectType: string
+  budget: string
+  timeline: string
+  referralSource: string
   message: string
 }
 
-const form = ref<FormData>({ name: '', email: '', company: '', budget: '', projectType: '', message: '' })
+const form = ref<FormData>({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  company: '',
+  projectType: '',
+  budget: '',
+  timeline: '',
+  referralSource: '',
+  message: '',
+})
 const submitted = ref(false)
 const isSubmitting = ref(false)
+const submitError = ref('')
 
 const projectTypes = computed(() => tm('contact.form.projectTypes') as string[])
 const budgets = computed(() => tm('contact.form.budgets') as string[])
+const timelines = computed(() => tm('contact.form.timelines') as string[])
+const referralSources = computed(() => tm('contact.form.referralSources') as string[])
 
 const socials = computed(() => [
-  { label: t('contact.socials.whatsapp'), href: 'https://wa.me/17633524852',       icon: 'fa-brands fa-whatsapp' },
-  { label: t('contact.socials.instagram'), href: 'https://instagram.com/yeyo.dev', icon: 'fa-brands fa-instagram' },
-  { label: t('contact.socials.twitter'),  href: 'https://x.com/yeyodev',           icon: 'fa-brands fa-x-twitter' },
-  { label: t('contact.socials.email'),    href: 'mailto:diegorele13@gmail.com',    icon: 'fa-solid fa-envelope' },
+  {
+    label: t('contact.socials.whatsapp'),
+    href: 'https://wa.me/593963681303',
+    icon: 'fa-brands fa-whatsapp',
+  },
+  {
+    label: t('contact.socials.instagram'),
+    href: 'https://instagram.com/yeyo.dev',
+    icon: 'fa-brands fa-instagram',
+  },
+  {
+    label: t('contact.socials.twitter'),
+    href: 'https://x.com/yeyodev',
+    icon: 'fa-brands fa-x-twitter',
+  },
+  {
+    label: t('contact.socials.email'),
+    href: 'mailto:diegorele13@gmail.com',
+    icon: 'fa-solid fa-envelope',
+  },
 ])
+
+const WHATSAPP_NUMBER = '593963681303'
+
+function buildWhatsAppMessage(f: FormData): string {
+  return (
+    `👋 *Nuevo contacto desde yeyo.dev*\n\n` +
+    `*Nombre:* ${f.firstName} ${f.lastName}\n` +
+    `*Email:* ${f.email}\n` +
+    `*Teléfono:* ${f.phone}\n` +
+    `*Empresa:* ${f.company || '—'}\n` +
+    `*Proyecto:* ${f.projectType}\n` +
+    `*Presupuesto:* ${f.budget || '—'}\n` +
+    `*Timeline:* ${f.timeline}\n` +
+    `*Cómo me encontró:* ${f.referralSource || '—'}\n` +
+    `*Mensaje:* ${f.message}`
+  )
+}
+
+const whatsappUrl = computed(() => {
+  const text = encodeURIComponent(buildWhatsAppMessage(form.value))
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${text}`
+})
+
+function buildTags(f: FormData): string[] {
+  return [
+    'lead',
+    'yeyo.dev',
+    `project-type: ${f.projectType}`,
+    `timeline: ${f.timeline}`,
+    `referral: ${f.referralSource || 'direct'}`,
+    f.budget ? `budget: ${f.budget}` : '',
+  ].filter(Boolean)
+}
+
+function buildNote(f: FormData): string {
+  const lines = [
+    `👤 Nombre: ${f.firstName} ${f.lastName}`,
+    `📧 Email: ${f.email}`,
+    `📞 Teléfono: ${f.phone}`,
+    `🏢 Empresa: ${f.company || '—'}`,
+    `📋 Tipo de proyecto: ${f.projectType}`,
+    `💰 Presupuesto: ${f.budget || '—'}`,
+    `⏱ Timeline: ${f.timeline}`,
+    `🔍 Cómo me encontró: ${f.referralSource || '—'}`,
+    `💬 Mensaje: ${f.message}`,
+    ``,
+    `🕐 Enviado: ${new Date().toLocaleString()}`,
+    `📱 Fuente: yeyo.dev`,
+  ]
+  return lines.join('\n')
+}
+
+function buildPayload(f: FormData, extra: Record<string, unknown> = {}) {
+  return {
+    firstName: f.firstName,
+    lastName: f.lastName,
+    email: f.email,
+    phone: f.phone,
+    company: f.company,
+    projectType: f.projectType,
+    budget: f.budget,
+    timeline: f.timeline,
+    referralSource: f.referralSource,
+    message: f.message,
+    source: 'yeyo.dev',
+    submittedAt: new Date().toISOString(),
+    tags: buildTags(f),
+    ...extra,
+  }
+}
+
+async function postTo(url: string, data: Record<string, unknown>): Promise<void> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) throw new Error(`Webhook HTTP ${res.status}`)
+}
 
 const handleSubmit = async () => {
   isSubmitting.value = true
-  await new Promise(resolve => setTimeout(resolve, 1200))
-  submitted.value = true
-  isSubmitting.value = false
+  submitError.value = ''
+  const errors: string[] = []
+
+  try {
+    const promises: Promise<void>[] = []
+
+    if (WEBHOOK_URL) {
+      const leadPayload = buildPayload(form.value)
+      promises.push(
+        postTo(WEBHOOK_URL, leadPayload).catch(() => {
+          errors.push('lead-registration')
+        }),
+      )
+    }
+
+    if (QUALIFICATION_WEBHOOK) {
+      const qualPayload = buildPayload(form.value, {
+        notes: buildNote(form.value),
+        qualified: true,
+      })
+      promises.push(
+        postTo(QUALIFICATION_WEBHOOK, qualPayload).catch(() => {
+          errors.push('qualification')
+        }),
+      )
+    }
+
+    await Promise.allSettled(promises)
+
+    if (promises.length > 0 && errors.length === promises.length) {
+      submitError.value = 'Error al enviar. Contáctame directo por WhatsApp.'
+      return
+    }
+
+    submitted.value = true
+  } catch {
+    submitError.value = 'Error inesperado. Contáctame por WhatsApp.'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
 
@@ -41,7 +195,8 @@ const handleSubmit = async () => {
       <div class="contact__header">
         <span class="contact__eyebrow">{{ t('contact.eyebrow') }}</span>
         <h2 class="contact__title">
-          {{ t('contact.title') }} <span class="contact__title--accent">{{ t('contact.titleAccent') }}</span>
+          {{ t('contact.title') }}
+          <span class="contact__title--accent">{{ t('contact.titleAccent') }}</span>
         </h2>
         <p class="contact__subtitle">{{ t('contact.subtitle') }}</p>
       </div>
@@ -56,7 +211,14 @@ const handleSubmit = async () => {
           </div>
           <p class="contact__info-text">{{ t('contact.info.based') }}</p>
           <div class="contact__socials">
-            <a v-for="s in socials" :key="s.label" :href="s.href" target="_blank" rel="noopener noreferrer" class="contact__social">
+            <a
+              v-for="s in socials"
+              :key="s.label"
+              :href="s.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="contact__social"
+            >
               <i :class="s.icon" class="contact__social-icon" />
               {{ s.label }}
             </a>
@@ -71,47 +233,126 @@ const handleSubmit = async () => {
             <form v-if="!submitted" class="contact__form" @submit.prevent="handleSubmit">
               <div class="contact__row">
                 <div class="contact__field">
-                  <label class="contact__label">{{ t('contact.form.name') }}</label>
-                  <input v-model="form.name" type="text" required :placeholder="t('contact.form.namePlaceholder')" class="contact__input" />
+                  <label class="contact__label">{{ t('contact.form.firstName') }}</label>
+                  <input
+                    v-model="form.firstName"
+                    type="text"
+                    required
+                    :placeholder="t('contact.form.firstNamePlaceholder')"
+                    class="contact__input"
+                  />
                 </div>
                 <div class="contact__field">
+                  <label class="contact__label">{{ t('contact.form.lastName') }}</label>
+                  <input
+                    v-model="form.lastName"
+                    type="text"
+                    required
+                    :placeholder="t('contact.form.lastNamePlaceholder')"
+                    class="contact__input"
+                  />
+                </div>
+              </div>
+              <div class="contact__row">
+                <div class="contact__field">
                   <label class="contact__label">{{ t('contact.form.email') }}</label>
-                  <input v-model="form.email" type="email" required :placeholder="t('contact.form.emailPlaceholder')" class="contact__input" />
+                  <input
+                    v-model="form.email"
+                    type="email"
+                    required
+                    :placeholder="t('contact.form.emailPlaceholder')"
+                    class="contact__input"
+                  />
+                </div>
+                <div class="contact__field">
+                  <label class="contact__label">{{ t('contact.form.phone') }}</label>
+                  <input
+                    v-model="form.phone"
+                    type="tel"
+                    required
+                    :placeholder="t('contact.form.phonePlaceholder')"
+                    class="contact__input"
+                  />
                 </div>
               </div>
               <div class="contact__field">
                 <label class="contact__label">{{ t('contact.form.company') }}</label>
-                <input v-model="form.company" type="text" :placeholder="t('contact.form.companyPlaceholder')" class="contact__input" />
+                <input
+                  v-model="form.company"
+                  type="text"
+                  :placeholder="t('contact.form.companyPlaceholder')"
+                  class="contact__input"
+                />
               </div>
               <div class="contact__row">
                 <div class="contact__field">
                   <label class="contact__label">{{ t('contact.form.projectType') }}</label>
-                  <select v-model="form.projectType" required class="contact__input contact__select">
-                    <option value="" disabled>{{ t('contact.form.projectTypePlaceholder') }}</option>
-                    <option v-for="pt in projectTypes" :key="pt" :value="pt">{{ pt }}</option>
-                  </select>
+                  <BaseSelect
+                    v-model="form.projectType"
+                    :options="projectTypes"
+                    :placeholder="t('contact.form.projectTypePlaceholder')"
+                    required
+                  />
                 </div>
                 <div class="contact__field">
                   <label class="contact__label">{{ t('contact.form.budget') }}</label>
-                  <select v-model="form.budget" class="contact__input contact__select">
-                    <option value="" disabled>{{ t('contact.form.budgetPlaceholder') }}</option>
-                    <option v-for="b in budgets" :key="b" :value="b">{{ b }}</option>
-                  </select>
+                  <BaseSelect
+                    v-model="form.budget"
+                    :options="budgets"
+                    :placeholder="t('contact.form.budgetPlaceholder')"
+                  />
+                </div>
+              </div>
+              <div class="contact__row">
+                <div class="contact__field">
+                  <label class="contact__label">{{ t('contact.form.timeline') }}</label>
+                  <BaseSelect
+                    v-model="form.timeline"
+                    :options="timelines"
+                    :placeholder="t('contact.form.timelinePlaceholder')"
+                    required
+                  />
+                </div>
+                <div class="contact__field">
+                  <label class="contact__label">{{ t('contact.form.referralSource') }}</label>
+                  <BaseSelect
+                    v-model="form.referralSource"
+                    :options="referralSources"
+                    :placeholder="t('contact.form.referralSourcePlaceholder')"
+                  />
                 </div>
               </div>
               <div class="contact__field">
                 <label class="contact__label">{{ t('contact.form.message') }}</label>
-                <textarea v-model="form.message" required rows="4" :placeholder="t('contact.form.messagePlaceholder')" class="contact__input contact__textarea" />
+                <textarea
+                  v-model="form.message"
+                  required
+                  rows="4"
+                  :placeholder="t('contact.form.messagePlaceholder')"
+                  class="contact__input contact__textarea"
+                />
               </div>
+              <p v-if="submitError" class="contact__error">{{ submitError }}</p>
               <button type="submit" class="contact__submit" :disabled="isSubmitting">
                 <span v-if="isSubmitting" class="contact__spinner" />
                 <span v-else>{{ t('contact.form.submit') }}</span>
               </button>
             </form>
             <div v-else class="contact__success">
-              <div class="contact__success-icon">✓</div>
+              <div class="contact__success-icon">
+                <i class="fa-brands fa-whatsapp" />
+              </div>
               <h3>{{ t('contact.success.title') }}</h3>
               <p>{{ t('contact.success.text') }}</p>
+              <a
+                :href="whatsappUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="contact__whatsapp-btn"
+              >
+                <i class="fa-brands fa-whatsapp" />
+                {{ t('contact.success.whatsappCta') }}
+              </a>
             </div>
           </Transition>
         </div>
@@ -121,11 +362,14 @@ const handleSubmit = async () => {
 </template>
 
 <style lang="scss" scoped>
-
-
 @keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.5); }
-  50%       { box-shadow: 0 0 0 6px rgba(6, 214, 160, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(6, 214, 160, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(6, 214, 160, 0);
+  }
 }
 
 .contact {
@@ -137,7 +381,9 @@ const handleSubmit = async () => {
     margin: 0 auto;
     padding: 0 1.5rem;
 
-    @media (min-width: $breakpoint-md) { padding: 0 2rem; }
+    @media (min-width: $breakpoint-md) {
+      padding: 0 2rem;
+    }
   }
 
   &__header {
@@ -330,13 +576,17 @@ const handleSubmit = async () => {
     font-size: 0.95rem;
     color: $text-primary;
     font-family: 'Roboto', sans-serif;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
     width: 100%;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
 
-    &::placeholder { color: $text-muted; }
+    &::placeholder {
+      color: $text-muted;
+    }
 
     &:focus {
       border-color: $accent-primary;
@@ -344,14 +594,7 @@ const handleSubmit = async () => {
     }
   }
 
-  &__select {
-    cursor: pointer;
 
-    option {
-      background: $bg-secondary;
-      color: $text-primary;
-    }
-  }
 
   &__textarea {
     resize: vertical;
@@ -387,6 +630,13 @@ const handleSubmit = async () => {
     }
   }
 
+  &__error {
+    font-size: 0.85rem;
+    color: #ef4444;
+    text-align: center;
+    margin-top: -0.5rem;
+  }
+
   &__spinner {
     width: 20px;
     height: 20px;
@@ -397,7 +647,9 @@ const handleSubmit = async () => {
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   // ── Success ───────────────────────────────────────────────────────────────
@@ -420,6 +672,30 @@ const handleSubmit = async () => {
     }
   }
 
+  &__whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    border-radius: 999px;
+    background: #25d366;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 24px rgba(37, 211, 102, 0.4);
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+    text-decoration: none;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(37, 211, 102, 0.6);
+    }
+  }
+
   &__success-icon {
     width: 64px;
     height: 64px;
@@ -439,6 +715,12 @@ const handleSubmit = async () => {
 .slide-fade-leave-active {
   transition: all 0.4s ease;
 }
-.slide-fade-enter-from { opacity: 0; transform: translateY(20px); }
-.slide-fade-leave-to   { opacity: 0; transform: translateY(-10px); }
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 </style>
