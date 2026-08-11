@@ -16,14 +16,42 @@ const currentYear = new Date().getFullYear()
           <a href="#projects">{{ t('footer.links.work') }}</a>
           <a href="#services">{{ t('footer.links.services') }}</a>
           <a href="#contact">{{ t('footer.links.contact') }}</a>
-          <a href="https://www.self.so/yeyodev" target="_blank" rel="noopener noreferrer">{{ t('footer.links.resume') }}</a>
+          <a href="https://www.self.so/yeyodev" target="_blank" rel="noopener noreferrer">{{
+            t('footer.links.resume')
+          }}</a>
         </div>
         <div class="footer__socials">
-          <a href="https://github.com/yeyodev1" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github" /></a>
-          <a href="https://www.linkedin.com/in/yeyodev1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin" /></a>
-          <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp" /></a>
-          <a href="https://www.instagram.com/yeyo.dev/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram" /></a>
-          <a href="https://x.com/yeyodev" target="_blank" rel="noopener noreferrer" aria-label="X"><i class="fa-brands fa-x-twitter" /></a>
+          <a
+            href="https://github.com/yeyodev1"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            ><i class="fa-brands fa-github"
+          /></a>
+          <a
+            href="https://www.linkedin.com/in/yeyodev1"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn"
+            ><i class="fa-brands fa-linkedin"
+          /></a>
+          <a
+            href="https://wa.me/593963681303"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            ><i class="fa-brands fa-whatsapp"
+          /></a>
+          <a
+            href="https://www.instagram.com/yeyo.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            ><i class="fa-brands fa-instagram"
+          /></a>
+          <a href="https://x.com/yeyodev" target="_blank" rel="noopener noreferrer" aria-label="X"
+            ><i class="fa-brands fa-x-twitter"
+          /></a>
         </div>
       </div>
       <div class="footer__bottom">
@@ -35,8 +63,6 @@ const currentYear = new Date().getFullYear()
 </template>
 
 <style lang="scss" scoped>
-
-
 .footer {
   background: $bg-deep;
   border-top: 1px solid $border-subtle;
@@ -97,7 +123,9 @@ const currentYear = new Date().getFullYear()
       font-family: 'Roboto', sans-serif;
       transition: color 0.2s ease;
 
-      &:hover { color: $text-primary; }
+      &:hover {
+        color: $text-primary;
+      }
     }
   }
 
