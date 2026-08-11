@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
-import { Application } from '@splinetool/runtime'
+// Type-only import: the ~2 MB runtime is pulled in lazily on mount instead of
+// being bundled into the HomeView chunk.
+import type { Application } from '@splinetool/runtime'
 
 interface Props {
   scene: string
@@ -19,13 +21,17 @@ let rafFrame: number | null = null
 const forceTransparentBg = (c: HTMLCanvasElement) => {
   const gl = c.getContext('webgl2', { alpha: true }) ?? c.getContext('webgl', { alpha: true })
   if (!gl) return
-  const tick = () => { gl.clearColor(0, 0, 0, 0); rafFrame = requestAnimationFrame(tick) }
+  const tick = () => {
+    gl.clearColor(0, 0, 0, 0)
+    rafFrame = requestAnimationFrame(tick)
+  }
   rafFrame = requestAnimationFrame(tick)
 }
 
 onMounted(async () => {
   if (!canvas.value) return
   try {
+    const { Application } = await import('@splinetool/runtime')
     app = new Application(canvas.value)
     await app.load(props.scene)
     forceTransparentBg(canvas.value)
@@ -76,7 +82,11 @@ onUnmounted(() => {
 }
 
 .fade-enter-active,
-.fade-leave-active { transition: opacity 0.6s ease; }
+.fade-leave-active {
+  transition: opacity 0.6s ease;
+}
 .fade-enter-from,
-.fade-leave-to     { opacity: 0; }
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
