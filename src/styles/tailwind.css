@@ -1,0 +1,6 @@
+/* Plain CSS entry so Sass never parses this @import rule.
+   Sass deprecates `@import` (removed in Dart Sass 3.0), and Tailwind v4 is
+   consumed through @tailwindcss/vite — not through the Sass compiler.
+   Google Fonts is loaded via <link> in index.html: a trailing @import inside a
+   generated stylesheet violates the "@import must precede all rules" rule. */
+@import 'tailwindcss';
