@@ -5,27 +5,27 @@ import { Application } from '@splinetool/runtime'
 const SCENE = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
 
 // ── Canvas refs ───────────────────────────────────────────────────────────────
-const heroCanvas   = ref<HTMLCanvasElement | null>(null)
+const heroCanvas = ref<HTMLCanvasElement | null>(null)
 const footerCanvas = ref<HTMLCanvasElement | null>(null)
 const mobileCanvas = ref<HTMLCanvasElement | null>(null)
 
 // ── App instances (one per zone — independent state) ─────────────────────────
-let heroApp:   Application | null = null
+let heroApp: Application | null = null
 let footerApp: Application | null = null
 let mobileApp: Application | null = null
 
 // ── Loaded flags ──────────────────────────────────────────────────────────────
-const isHeroLoaded   = ref(false)
+const isHeroLoaded = ref(false)
 const isFooterLoaded = ref(false)
 const isMobileLoaded = ref(false)
 const mobileExpanded = ref(false)
 
 // ── Per-zone opacity (animated independently) ─────────────────────────────────
-const heroOpacity   = ref(1)
+const heroOpacity = ref(1)
 const footerOpacity = ref(0)
 
 // ── Relay cleanups ────────────────────────────────────────────────────────────
-let cleanupHeroRelay:   (() => void) | null = null
+let cleanupHeroRelay: (() => void) | null = null
 let cleanupFooterRelay: (() => void) | null = null
 
 // ── Scroll handler — computes each zone's opacity independently ───────────────
@@ -33,16 +33,10 @@ const handleScroll = () => {
   const p = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight)
 
   // Hero:   fully visible 0–20 %, fade out 20–32 %, invisible after that
-  heroOpacity.value =
-    p < 0.20 ? 1 :
-    p < 0.32 ? 1 - (p - 0.20) / 0.12 :
-    0
+  heroOpacity.value = p < 0.2 ? 1 : p < 0.32 ? 1 - (p - 0.2) / 0.12 : 0
 
   // Footer: invisible until 70 %, fade in 70–83 %, fully visible after that
-  footerOpacity.value =
-    p < 0.70 ? 0 :
-    p < 0.83 ? (p - 0.70) / 0.13 :
-    1
+  footerOpacity.value = p < 0.7 ? 0 : p < 0.83 ? (p - 0.7) / 0.13 : 1
 
   // Lazy-load the footer instance when it first becomes relevant
   if (p > 0.65 && !footerApp) loadFooter()
@@ -51,11 +45,13 @@ const handleScroll = () => {
 // ── Force WebGL clear-color to transparent ────────────────────────────────────
 const forceTransparentBg = (canvas: HTMLCanvasElement) => {
   const gl =
-    canvas.getContext('webgl2', { alpha: true }) ??
-    canvas.getContext('webgl',  { alpha: true })
+    canvas.getContext('webgl2', { alpha: true }) ?? canvas.getContext('webgl', { alpha: true })
   if (!gl) return
   let frame: number
-  const tick = () => { gl.clearColor(0, 0, 0, 0); frame = requestAnimationFrame(tick) }
+  const tick = () => {
+    gl.clearColor(0, 0, 0, 0)
+    frame = requestAnimationFrame(tick)
+  }
   frame = requestAnimationFrame(tick)
   return () => cancelAnimationFrame(frame)
 }
@@ -72,11 +68,16 @@ const buildRelay = (canvas: HTMLCanvasElement) => {
     // eliminates the "staring at ceiling/floor" issue regardless of
     // where the cursor is or what Spline's default pose is.
     const mappedY = rect.top + rect.height * 0.5
-    canvas.dispatchEvent(new PointerEvent('pointermove', {
-      bubbles: true, cancelable: true,
-      clientX: mappedX, clientY: mappedY,
-      pointerType: 'mouse', isPrimary: true,
-    }))
+    canvas.dispatchEvent(
+      new PointerEvent('pointermove', {
+        bubbles: true,
+        cancelable: true,
+        clientX: mappedX,
+        clientY: mappedY,
+        pointerType: 'mouse',
+        isPrimary: true,
+      }),
+    )
   }
 
   const onMove = (e: MouseEvent) => fire(e.clientX)
@@ -129,7 +130,9 @@ const loadMobile = async () => {
   isMobileLoaded.value = true
 }
 
-watch(mobileExpanded, async (val) => { if (val && !mobileApp) await loadMobile() })
+watch(mobileExpanded, async (val) => {
+  if (val && !mobileApp) await loadMobile()
+})
 
 const isDesktopViewport = () => window.innerWidth >= 1024
 
@@ -145,17 +148,19 @@ onUnmounted(() => {
   mobileApp?.dispose()
   cleanupHeroRelay?.()
   cleanupFooterRelay?.()
-  window.removeEventListener  ('scroll', handleScroll)
-  document.removeEventListener('wheel',  blockSplineWheel)
+  window.removeEventListener('scroll', handleScroll)
+  document.removeEventListener('wheel', blockSplineWheel)
 })
 </script>
 
 <template>
   <!-- ── Desktop: fixed right panel with TWO independent instances ─────────── -->
   <div class="robot-desktop" aria-hidden="true">
-
     <!-- Hero instance — visible in the hero section -->
-    <div class="robot-desktop__zone" :style="{ opacity: heroOpacity, transition: 'opacity 0.6s ease' }">
+    <div
+      class="robot-desktop__zone"
+      :style="{ opacity: heroOpacity, transition: 'opacity 0.6s ease' }"
+    >
       <Transition name="robot-fade">
         <div v-if="!isHeroLoaded" class="robot-desktop__loader">
           <div class="loader" />
@@ -166,7 +171,10 @@ onUnmounted(() => {
     </div>
 
     <!-- Footer instance — visible near the footer, fresh tracking state -->
-    <div class="robot-desktop__zone" :style="{ opacity: footerOpacity, transition: 'opacity 0.6s ease' }">
+    <div
+      class="robot-desktop__zone"
+      :style="{ opacity: footerOpacity, transition: 'opacity 0.6s ease' }"
+    >
       <Transition name="robot-fade">
         <div v-if="footerOpacity > 0 && !isFooterLoaded" class="robot-desktop__loader">
           <div class="loader" />
@@ -174,7 +182,6 @@ onUnmounted(() => {
       </Transition>
       <canvas ref="footerCanvas" class="robot-desktop__canvas" />
     </div>
-
   </div>
 
   <!-- ── Mobile: floating widget ─────────────────────────────────────────── -->
@@ -214,7 +221,6 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
 // ── Desktop panel ────────────────────────────────────────────────────────────
 .robot-desktop {
   display: none;
@@ -293,7 +299,9 @@ onUnmounted(() => {
     transform: scale(0.85) translateY(10px);
     transform-origin: bottom right;
     pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition:
+      opacity 0.3s ease,
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   &--open &__card {
@@ -325,7 +333,9 @@ onUnmounted(() => {
     padding: 0.25rem;
     line-height: 1;
     transition: color 0.2s;
-    &:hover { color: $text-primary; }
+    &:hover {
+      color: $text-primary;
+    }
   }
 
   &__scene {
@@ -357,7 +367,9 @@ onUnmounted(() => {
     color: $accent-light;
     border-top: 1px solid $border-subtle;
     transition: background 0.2s ease;
-    &:hover { background: rgba(124, 58, 237, 0.08); }
+    &:hover {
+      background: rgba(124, 58, 237, 0.08);
+    }
   }
 
   &__toggle {
@@ -373,10 +385,14 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 24px $accent-glow;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease;
     z-index: 1;
 
-    &:active { transform: scale(0.9); }
+    &:active {
+      transform: scale(0.9);
+    }
 
     &--active {
       background: $bg-elevated;
@@ -399,13 +415,26 @@ onUnmounted(() => {
 }
 
 @keyframes pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.7; }
-  70%  { transform: scale(1.4); opacity: 0; }
-  100% { transform: scale(1.4); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 
 .robot-fade-enter-active,
-.robot-fade-leave-active { transition: opacity 0.5s ease; }
+.robot-fade-leave-active {
+  transition: opacity 0.5s ease;
+}
 .robot-fade-enter-from,
-.robot-fade-leave-to     { opacity: 0; }
+.robot-fade-leave-to {
+  opacity: 0;
+}
 </style>
