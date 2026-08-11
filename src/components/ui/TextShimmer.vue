@@ -18,7 +18,11 @@ const animDuration = computed(() => `${props.duration}s`)
 </script>
 
 <template>
-  <span class="text-shimmer" :class="props.class" :style="{ '--spread': spreadPx, '--duration': animDuration }">
+  <span
+    class="text-shimmer"
+    :class="props.class"
+    :style="{ '--spread': spreadPx, '--duration': animDuration }"
+  >
     {{ props.text }}
   </span>
 </template>
@@ -31,14 +35,17 @@ const animDuration = computed(() => `${props.duration}s`)
   --duration: 2s;
 
   display: inline-block;
-  background: linear-gradient(
-    90deg,
-    transparent calc(50% - var(--spread)),
-    var(--highlight-color),
-    transparent calc(50% + var(--spread))
-  ),
-  linear-gradient(var(--base-color), var(--base-color));
-  background-size: 250% 100%, auto;
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(50% - var(--spread)),
+      var(--highlight-color),
+      transparent calc(50% + var(--spread))
+    ),
+    linear-gradient(var(--base-color), var(--base-color));
+  background-size:
+    250% 100%,
+    auto;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -48,7 +55,11 @@ const animDuration = computed(() => `${props.duration}s`)
 }
 
 @keyframes shimmer {
-  from { background-position: 100% center; }
-  to   { background-position: 0% center; }
+  from {
+    background-position: 100% center;
+  }
+  to {
+    background-position: 0% center;
+  }
 }
 </style>
