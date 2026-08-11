@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { useToast } from '@/composables/useToast'
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 const { isVisible, message, toastType } = useToast()
 
-const toastClasses = computed(() => [
-  'toast-notification',
-  `toast--${toastType.value}`
-]);
+const toastClasses = computed(() => ['toast-notification', `toast--${toastType.value}`])
 
 const toastIcon = computed(() => {
   switch (toastType.value) {
-    case 'success': return 'fa-check-circle';
-    case 'error': return 'fa-times-circle';
-    default: return 'fa-info-circle';
+    case 'success':
+      return 'fa-check-circle'
+    case 'error':
+      return 'fa-times-circle'
+    default:
+      return 'fa-info-circle'
   }
-});
+})
 </script>
 
 <template>
@@ -30,8 +30,6 @@ const toastIcon = computed(() => {
 </template>
 
 <style scoped lang="scss">
-
-
 .toast-notification {
   position: fixed;
   bottom: 2rem;
@@ -76,7 +74,9 @@ const toastIcon = computed(() => {
 
 .toast-fade-enter-active,
 .toast-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .toast-fade-enter-from,
