@@ -26,10 +26,13 @@ export function useCountUp(duration = 2000) {
       }
       frame = requestAnimationFrame(tick)
     }
-    if (delay > 0) setTimeout(start, delay); else start()
+    if (delay > 0) setTimeout(start, delay)
+    else start()
   }
 
-  onUnmounted(() => { if (frame) cancelAnimationFrame(frame) })
+  onUnmounted(() => {
+    if (frame) cancelAnimationFrame(frame)
+  })
 
   return { display, run }
 }
