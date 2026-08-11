@@ -9,7 +9,6 @@ onMounted(load)
 
 <template>
   <div class="gh">
-
     <!-- Loading skeleton -->
     <div v-if="loading" class="gh__loading">
       <i class="fa-brands fa-github gh__loading-icon" />
@@ -23,7 +22,6 @@ onMounted(load)
     </div>
 
     <template v-else-if="user">
-
       <!-- Header -->
       <div class="gh__header">
         <i class="fa-brands fa-github gh__brand-icon" />
@@ -35,24 +33,14 @@ onMounted(load)
 
       <!-- Language pills -->
       <div v-if="languages.length" class="gh__langs">
-        <span
-          v-for="l in languages.slice(0, 6)"
-          :key="l.lang"
-          class="gh__lang"
-        >{{ l.lang }}</span>
+        <span v-for="l in languages.slice(0, 6)" :key="l.lang" class="gh__lang">{{ l.lang }}</span>
       </div>
 
       <!-- Recent commits -->
       <div v-if="recentCommits.length" class="gh__commits">
-        <p class="gh__section-label">
-          <i class="fa-solid fa-code-commit" /> Recent commits
-        </p>
+        <p class="gh__section-label"><i class="fa-solid fa-code-commit" /> Recent commits</p>
         <ul class="gh__commit-list">
-          <li
-            v-for="c in recentCommits.slice(0, 5)"
-            :key="c.sha"
-            class="gh__commit"
-          >
+          <li v-for="c in recentCommits.slice(0, 5)" :key="c.sha" class="gh__commit">
             <span class="gh__commit-sha">{{ c.sha }}</span>
             <span class="gh__commit-repo">{{ c.repo }}</span>
             <span class="gh__commit-msg">{{ c.message }}</span>
@@ -62,9 +50,7 @@ onMounted(load)
 
       <!-- Top repos -->
       <div v-if="topRepos.length" class="gh__repos">
-        <p class="gh__section-label">
-          <i class="fa-solid fa-star" /> Top repos
-        </p>
+        <p class="gh__section-label"><i class="fa-solid fa-star" /> Top repos</p>
         <ul class="gh__repo-list">
           <li v-for="r in topRepos.slice(0, 4)" :key="r.id" class="gh__repo">
             <a :href="r.html_url" target="_blank" rel="noopener noreferrer" class="gh__repo-name">
@@ -77,7 +63,6 @@ onMounted(load)
           </li>
         </ul>
       </div>
-
     </template>
   </div>
 </template>
@@ -107,7 +92,9 @@ onMounted(load)
     color: $text-muted;
   }
 
-  &__error { color: #f87171; }
+  &__error {
+    color: #f87171;
+  }
 
   &__header {
     display: flex;
@@ -159,7 +146,9 @@ onMounted(load)
     align-items: center;
     gap: 0.4rem;
 
-    i { color: $accent-primary; }
+    i {
+      color: $accent-primary;
+    }
   }
 
   &__commit-list,
@@ -216,7 +205,9 @@ onMounted(load)
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    &:hover { color: $accent-light; }
+    &:hover {
+      color: $accent-light;
+    }
   }
 
   &__repo-lang {
@@ -233,7 +224,9 @@ onMounted(load)
     color: $accent-gold;
     flex-shrink: 0;
 
-    i { font-size: 0.65rem; }
+    i {
+      font-size: 0.65rem;
+    }
   }
 }
 </style>
