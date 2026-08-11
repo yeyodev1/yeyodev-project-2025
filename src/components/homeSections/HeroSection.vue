@@ -10,7 +10,7 @@ const { t, locale } = useI18n()
 const isLoaded = ref(false)
 const mouseX = ref(0)
 const mouseY = ref(0)
-const heroRef   = ref<HTMLElement | null>(null)
+const heroRef = ref<HTMLElement | null>(null)
 const visualRef = ref<HTMLElement | null>(null)
 const glowX = ref(50)
 const glowY = ref(50)
@@ -20,17 +20,18 @@ const { totalCommits, load: loadGithub } = useGithub()
 const roles = computed(() =>
   locale.value === 'es'
     ? ['Full Stack Dev', 'CTO @ Bakano', 'Experto Vue.js', 'Entrenador IA', 'Arquitecto Tech']
-    : ['Full Stack Dev', 'CTO @ Bakano', 'Vue.js Expert', 'AI Trainer', 'Tech Architect']
+    : ['Full Stack Dev', 'CTO @ Bakano', 'Vue.js Expert', 'AI Trainer', 'Tech Architect'],
 )
 
 const stats = computed(() => [
   { value: '6+', label: t('hero.stats.years') },
   {
-    value: totalCommits.value > 0
-      ? totalCommits.value >= 1000
-        ? `${(totalCommits.value / 1000).toFixed(1)}K`
-        : String(totalCommits.value)
-      : '3.4K',
+    value:
+      totalCommits.value > 0
+        ? totalCommits.value >= 1000
+          ? `${(totalCommits.value / 1000).toFixed(1)}K`
+          : String(totalCommits.value)
+        : '3.4K',
     label: t('hero.stats.commits'),
   },
   { value: '4', label: t('hero.stats.countries') },
@@ -47,8 +48,8 @@ const handleMouseMove = (e: MouseEvent) => {
 const handleGlobalMouse = (e: MouseEvent) => {
   const rect = visualRef.value?.getBoundingClientRect()
   if (!rect) return
-  glowX.value = ((e.clientX - rect.left) / rect.width)  * 100
-  glowY.value = ((e.clientY - rect.top)  / rect.height) * 100
+  glowX.value = ((e.clientX - rect.left) / rect.width) * 100
+  glowY.value = ((e.clientY - rect.top) / rect.height) * 100
 }
 
 onMounted(() => {
@@ -77,7 +78,10 @@ onUnmounted(() => {
     />
     <div ref="visualRef" class="hero__visual">
       <div class="hero__robot-glow" :style="{ '--gx': glowX + '%', '--gy': glowY + '%' }" />
-      <SplineScene scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode" class="hero__spline" />
+      <SplineScene
+        scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+        class="hero__spline"
+      />
     </div>
     <div class="hero__container">
       <div class="hero__content">
@@ -88,7 +92,13 @@ onUnmounted(() => {
         <h1 class="hero__name">Diego Reyes</h1>
         <p class="hero__alias">{{ t('hero.alias') }} <span>Yeyo</span></p>
         <div class="hero__role-wrap">
-          <GooeyText :texts="roles" :morph-time="1.2" :cooldown-time="2" class="hero__gooey" text-class="hero__gooey-text" />
+          <GooeyText
+            :texts="roles"
+            :morph-time="1.2"
+            :cooldown-time="2"
+            class="hero__gooey"
+            text-class="hero__gooey-text"
+          />
         </div>
         <p class="hero__desc" v-html="t('hero.desc')" />
         <div class="hero__actions">
@@ -96,7 +106,7 @@ onUnmounted(() => {
             {{ t('hero.seeWork') }}
             <span class="hero__btn-arrow">→</span>
           </a>
-          <a href="https://wa.me/17633524852" target="_blank" rel="noopener noreferrer" class="hero__btn hero__btn--secondary">
+          <a href="#contact" class="hero__btn hero__btn--secondary">
             {{ t('hero.letsTalk') }}
           </a>
         </div>
@@ -116,31 +126,63 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
-
 // ── Animations ──────────────────────────────────────────────────────────────
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes fade-left {
-  from { opacity: 0; transform: translateX(-30px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @keyframes fade-right {
-  from { opacity: 0; transform: translateX(30px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50%       { opacity: 0.8; transform: scale(1.05); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
 @keyframes scroll-bounce {
-  0%, 100% { transform: scaleY(1); opacity: 0.4; }
-  50%       { transform: scaleY(1.6); opacity: 1; }
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scaleY(1.6);
+    opacity: 1;
+  }
 }
 @keyframes spin-slow {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ── Section ─────────────────────────────────────────────────────────────────
@@ -154,7 +196,9 @@ onUnmounted(() => {
   opacity: 0;
   transition: opacity 0.6s ease;
 
-  &--loaded { opacity: 1; }
+  &--loaded {
+    opacity: 1;
+  }
 
   // Grid background
   &__grid {
@@ -201,7 +245,7 @@ onUnmounted(() => {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 720px;           // constrain text to left half
+    max-width: 720px; // constrain text to left half
     padding: 6rem 1.5rem 4rem;
     display: flex;
     flex-direction: column;
@@ -334,7 +378,9 @@ onUnmounted(() => {
         box-shadow: 0 0 40px $accent-glow;
         transform: translateY(-2px);
 
-        .hero__btn-arrow { transform: translateX(4px); }
+        .hero__btn-arrow {
+          transform: translateX(4px);
+        }
       }
     }
 
@@ -396,7 +442,7 @@ onUnmounted(() => {
     pointer-events: none;
 
     @media (max-width: #{$breakpoint-md - 1px}) {
-      opacity: 0.35;   // subtle on mobile so text stays readable
+      opacity: 0.35; // subtle on mobile so text stays readable
     }
   }
 
@@ -408,8 +454,8 @@ onUnmounted(() => {
     z-index: 0;
     background: radial-gradient(
       circle 480px at var(--gx, 60%) var(--gy, 50%),
-      rgba(124, 58, 237, 0.30) 0%,
-      rgba(6, 214, 160, 0.10) 45%,
+      rgba(124, 58, 237, 0.3) 0%,
+      rgba(6, 214, 160, 0.1) 45%,
       transparent 70%
     );
   }
@@ -418,7 +464,7 @@ onUnmounted(() => {
     position: absolute;
     inset: 0;
     z-index: 1;
-    pointer-events: auto;   // Spline still gets mouse events for head tracking
+    pointer-events: auto; // Spline still gets mouse events for head tracking
   }
 
   // ── Scroll indicator ──────────────────────────────────────────────────────
