@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useLanguage } from '@/composables/useLanguage';
-import { useBlogPost } from '@/composables/useBlog';
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useLanguage } from '@/composables/useLanguage'
+import { useBlogPost } from '@/composables/useBlog'
 
-const route = useRoute();
-const { t } = useLanguage();
-const slug = route.params.slug as string;
-const { post, loading, error, fetchPost } = useBlogPost(slug);
+const route = useRoute()
+const { t } = useLanguage()
+const slug = route.params.slug as string
+const { post, loading, error, fetchPost } = useBlogPost(slug)
 
 // Estados para personalización
-const fontSize = ref<'small' | 'medium' | 'large'>('medium');
-const isDarkMode = ref(true);
+const fontSize = ref<'small' | 'medium' | 'large'>('medium')
+const isDarkMode = ref(true)
 
 // Computed para clases CSS
 const containerClasses = computed(() => ({
   'post-view': true,
   'post-view--dark': isDarkMode.value,
   'post-view--light': !isDarkMode.value,
-  [`post-view--${fontSize.value}`]: true
-}));
+  [`post-view--${fontSize.value}`]: true,
+}))
 
 // Lifecycle
 onMounted(() => {
-  fetchPost();
-});
+  fetchPost()
+})
 
 // Métodos
 const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value;
-};
+  isDarkMode.value = !isDarkMode.value
+}
 
 const changeFontSize = (size: 'small' | 'medium' | 'large') => {
-  fontSize.value = size;
-};
+  fontSize.value = size
+}
 </script>
 
 <template>
@@ -41,8 +41,8 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
     <!-- Controles de personalización -->
     <div class="post-controls">
       <div class="font-controls">
-        <button 
-          v-for="size in ['small', 'medium', 'large']" 
+        <button
+          v-for="size in ['small', 'medium', 'large']"
           :key="size"
           @click="changeFontSize(size as any)"
           :class="{ active: fontSize === size }"
@@ -51,7 +51,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
           {{ size === 'small' ? 'A' : size === 'medium' ? 'A' : 'A' }}
         </button>
       </div>
-      
+
       <button @click="toggleTheme" class="theme-toggle">
         {{ isDarkMode ? '☀️' : '🌙' }}
       </button>
@@ -75,7 +75,13 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
       <header class="post-header">
         <h1 class="post-title">{{ post.title }}</h1>
         <div class="post-meta">
-          <span class="post-date">{{ new Date(post.publishedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+          <span class="post-date">{{
+            new Date(post.publishedAt).toLocaleDateString('es-ES', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          }}</span>
           <span class="post-reading-time">{{ post.readingTime }} min de lectura</span>
           <span class="post-category">{{ post.category }}</span>
         </div>
@@ -87,9 +93,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
       <!-- Tags -->
       <footer class="post-footer">
         <div class="post-tags">
-          <span v-for="tag in post.tags" :key="tag" class="tag">
-            #{{ tag }}
-          </span>
+          <span v-for="tag in post.tags" :key="tag" class="tag"> #{{ tag }} </span>
         </div>
       </footer>
     </article>
@@ -97,33 +101,28 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
 </template>
 
 <style lang="scss" scoped>
-
-
 .post-view {
   min-height: 100vh;
   padding: 2rem 1rem;
   transition: all 0.3s ease;
-  
+
   // Modo oscuro (por defecto)
   &--dark {
-    background: linear-gradient(135deg, 
-      $YEYO-VIOLET 0%, 
-      rgba(26, 26, 46, 0.95) 20%, 
+    background: linear-gradient(
+      135deg,
+      $YEYO-VIOLET 0%,
+      rgba(26, 26, 46, 0.95) 20%,
       rgba(22, 33, 62, 0.9) 100%
     );
     color: rgba(255, 255, 255, 0.9);
   }
-  
+
   // Modo claro
   &--light {
-    background: linear-gradient(135deg, 
-      #f8fafc 0%, 
-      #e2e8f0 20%, 
-      #cbd5e1 100%
-    );
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 20%, #cbd5e1 100%);
     color: #1a202c;
   }
-  
+
   // Tamaños de fuente
   &--small {
     .post-body {
@@ -134,7 +133,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
       font-size: 2rem;
     }
   }
-  
+
   &--medium {
     .post-body {
       font-size: 1.1rem;
@@ -144,7 +143,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
       font-size: 2.5rem;
     }
   }
-  
+
   &--large {
     .post-body {
       font-size: 1.3rem;
@@ -164,7 +163,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
   display: flex;
   gap: 1rem;
   z-index: 100;
-  
+
   .font-controls {
     display: flex;
     gap: 0.5rem;
@@ -174,7 +173,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
     padding: 0.5rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
-  
+
   .font-btn {
     width: 40px;
     height: 40px;
@@ -185,21 +184,27 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 600;
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.2);
     }
-    
+
     &.active {
       background: rgba(79, 172, 254, 0.3);
       color: #4facfe;
     }
-    
-    &:nth-child(1) { font-size: 0.8rem; }
-    &:nth-child(2) { font-size: 1rem; }
-    &:nth-child(3) { font-size: 1.2rem; }
+
+    &:nth-child(1) {
+      font-size: 0.8rem;
+    }
+    &:nth-child(2) {
+      font-size: 1rem;
+    }
+    &:nth-child(3) {
+      font-size: 1.2rem;
+    }
   }
-  
+
   .theme-toggle {
     width: 50px;
     height: 50px;
@@ -211,7 +216,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
     cursor: pointer;
     font-size: 1.5rem;
     transition: all 0.3s ease;
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.2);
       transform: scale(1.05);
@@ -228,7 +233,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
   justify-content: center;
   min-height: 60vh;
   text-align: center;
-  
+
   .loading-spinner {
     width: 40px;
     height: 40px;
@@ -249,7 +254,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
   border-radius: 20px;
   padding: 3rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  
+
   .post-view--light & {
     background: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -259,7 +264,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
 .post-header {
   margin-bottom: 3rem;
   text-align: center;
-  
+
   .post-title {
     margin-bottom: 1.5rem;
     font-weight: 700;
@@ -269,7 +274,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
     background-clip: text;
     line-height: 1.2;
   }
-  
+
   .post-meta {
     display: flex;
     justify-content: center;
@@ -277,12 +282,12 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
     flex-wrap: wrap;
     opacity: 0.8;
     font-size: 0.9rem;
-    
+
     span {
       padding: 0.5rem 1rem;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 20px;
-      
+
       .post-view--light & {
         background: rgba(0, 0, 0, 0.1);
       }
@@ -292,19 +297,19 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
 
 .post-body {
   margin-bottom: 3rem;
-  
+
   :deep(h2) {
     font-size: 1.8rem;
     margin: 2rem 0 1rem;
     color: #4facfe;
     font-weight: 600;
   }
-  
+
   :deep(p) {
     margin-bottom: 1.5rem;
     text-align: justify;
   }
-  
+
   :deep(code) {
     background: rgba(79, 172, 254, 0.2);
     padding: 0.2rem 0.5rem;
@@ -316,16 +321,16 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
 .post-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 2rem;
-  
+
   .post-view--light & {
     border-top-color: rgba(0, 0, 0, 0.1);
   }
-  
+
   .post-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    
+
     .tag {
       padding: 0.5rem 1rem;
       background: rgba(79, 172, 254, 0.2);
@@ -339,47 +344,57 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
 
 // Animaciones
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 // Responsive
 @media (max-width: 768px) {
   .post-view {
     padding: 1rem 0.5rem;
-    
-    &--small .post-title { font-size: 1.5rem; }
-    &--medium .post-title { font-size: 2rem; }
-    &--large .post-title { font-size: 2.5rem; }
+
+    &--small .post-title {
+      font-size: 1.5rem;
+    }
+    &--medium .post-title {
+      font-size: 2rem;
+    }
+    &--large .post-title {
+      font-size: 2.5rem;
+    }
   }
-  
+
   .post-controls {
     top: 1rem;
     right: 1rem;
-    
+
     .font-controls {
       padding: 0.3rem;
     }
-    
+
     .font-btn {
       width: 35px;
       height: 35px;
     }
-    
+
     .theme-toggle {
       width: 45px;
       height: 45px;
     }
   }
-  
+
   .post-content {
     padding: 2rem 1.5rem;
     margin: 0 0.5rem;
   }
-  
+
   .post-header .post-meta {
     gap: 1rem;
-    
+
     span {
       padding: 0.3rem 0.8rem;
       font-size: 0.8rem;
@@ -391,7 +406,7 @@ const changeFontSize = (size: 'small' | 'medium' | 'large') => {
   .post-content {
     padding: 1.5rem 1rem;
   }
-  
+
   .post-header .post-meta {
     flex-direction: column;
     align-items: center;
