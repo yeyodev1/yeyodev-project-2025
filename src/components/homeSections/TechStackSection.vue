@@ -10,34 +10,62 @@ const techCategories = [
     icon: '🎨',
     color: '#42b883',
     skills: [
-      { name: 'Vue.js', level: 95, description: 'Framework principal para desarrollo de interfaces' },
-      { name: 'TypeScript', level: 90, description: 'Tipado estático para JavaScript' },
-      { name: 'SCSS', level: 85, description: 'Preprocesador CSS avanzado' },
-      { name: 'Vite', level: 88, description: 'Build tool moderno y rápido' }
-    ]
+      {
+        name: 'Vue.js',
+        level: 95,
+        description: 'Framework progresivo — SPA, SSR, ecosistema completo',
+      },
+      { name: 'TypeScript', level: 92, description: 'Tipado robusto para apps a escala' },
+      {
+        name: 'Tailwind CSS',
+        level: 90,
+        description: 'Utilidades primero, diseño rápido y consistente',
+      },
+      { name: 'SCSS', level: 88, description: 'Arquitectura BEM, variables, mixins avanzados' },
+      { name: 'Vite', level: 90, description: 'Build tool ultrarrápido con HMR instantáneo' },
+    ],
   },
   {
     name: 'Backend',
     icon: '⚙️',
     color: '#ff6b6b',
     skills: [
-      { name: 'Node.js', level: 85, description: 'Runtime de JavaScript en servidor' },
-      { name: 'Express', level: 80, description: 'Framework web para Node.js' },
-      { name: 'MongoDB', level: 75, description: 'Base de datos NoSQL' },
-      { name: 'SheetsDB', level: 70, description: 'Base de datos en hojas de cálculo' }
-    ]
+      { name: 'Node.js', level: 88, description: 'APIs REST, websockets, serverless' },
+      { name: 'Express / Fastify', level: 85, description: 'Frameworks web ligeros y eficientes' },
+      { name: 'MongoDB', level: 80, description: 'Esquemas flexibles, agregaciones, índices' },
+      { name: 'PostgreSQL', level: 75, description: 'SQL relacional, consultas complejas' },
+    ],
+  },
+  {
+    name: 'AI & Data',
+    icon: '🤖',
+    color: '#f59e0b',
+    skills: [
+      {
+        name: 'LLM Integration',
+        level: 85,
+        description: 'OpenAI, Claude, Gemini — APIs y fine-tuning',
+      },
+      { name: 'AI Training', level: 80, description: 'Entrené modelos en Scale AI para GPT-3/3.5' },
+      {
+        name: 'Data Pipelines',
+        level: 75,
+        description: 'ETL, automatización, procesamiento de datos',
+      },
+      { name: 'Python', level: 78, description: 'Scripting, análisis de datos, automatización' },
+    ],
   },
   {
     name: 'Tools & DevOps',
     icon: '🛠️',
     color: '#4ecdc4',
     skills: [
-      { name: 'Git', level: 90, description: 'Control de versiones' },
-      { name: 'Docker', level: 75, description: 'Containerización de aplicaciones' },
-      { name: 'AWS', level: 70, description: 'Servicios en la nube' },
-      { name: 'CI/CD', level: 80, description: 'Integración y despliegue continuo' }
-    ]
-  }
+      { name: 'Git', level: 92, description: 'Control de versiones, flujos colaborativos' },
+      { name: 'Docker', level: 78, description: 'Contenedores, entornos reproducibles' },
+      { name: 'Netlify / Vercel', level: 88, description: 'Deploy automático, edge functions' },
+      { name: 'CI/CD', level: 82, description: 'Integración y despliegue continuo automatizado' },
+    ],
+  },
 ]
 
 const handleSkillHover = (skillName: string) => {
@@ -62,38 +90,38 @@ onMounted(() => {
       <div class="stack__bg-circle stack__bg-circle--2"></div>
       <div class="stack__bg-circle stack__bg-circle--3"></div>
     </div>
-    
+
     <div class="stack__container">
       <header class="stack__header">
-        <h2 class="stack__title">Tech Stack</h2>
+        <h2 class="stack__title">Stack</h2>
         <p class="stack__subtitle">
-          Tecnologías y herramientas que domino para crear experiencias digitales excepcionales
+          Tecnologías y herramientas que uso para construir productos digitales completos
         </p>
       </header>
-      
+
       <div class="stack__categories">
-        <div 
-          v-for="(category, categoryIndex) in techCategories" 
+        <div
+          v-for="(category, categoryIndex) in techCategories"
           :key="category.name"
           class="stack__category"
           :style="{
             '--category-color': category.color,
-            '--category-delay': categoryIndex
+            '--category-delay': categoryIndex,
           }"
         >
           <div class="stack__category-header">
             <span class="stack__category-icon">{{ category.icon }}</span>
             <h3 class="stack__category-title">{{ category.name }}</h3>
           </div>
-          
+
           <div class="stack__skills-grid">
-            <div 
-              v-for="(skill, skillIndex) in category.skills" 
+            <div
+              v-for="(skill, skillIndex) in category.skills"
               :key="skill.name"
               class="stack__skill"
               :style="{
                 '--skill-delay': skillIndex,
-                '--skill-level': skill.level + '%'
+                '--skill-level': skill.level + '%',
               }"
               @mouseenter="handleSkillHover(skill.name)"
               @mouseleave="handleSkillLeave"
@@ -107,8 +135,8 @@ onMounted(() => {
                   <div class="stack__skill-progress"></div>
                 </div>
               </div>
-              
-              <div 
+
+              <div
                 class="stack__skill-tooltip"
                 :class="{ 'is-visible': hoveredSkill === skill.name }"
               >
@@ -123,8 +151,6 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
-
 @keyframes category-fade-in {
   from {
     opacity: 0;
@@ -160,7 +186,6 @@ onMounted(() => {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -182,7 +207,6 @@ onMounted(() => {
 }
 
 @keyframes gradient-shift {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -195,13 +219,15 @@ onMounted(() => {
 
 .stack {
   padding: 8rem 1.5rem;
-  background: linear-gradient(135deg,
-      $YEYO-VIOLET 0%,
-      rgba(26, 26, 46, 0.95) 20%,
-      rgba(22, 33, 62, 0.9) 40%,
-      rgba(15, 52, 96, 0.85) 60%,
-      rgba(34, 34, 59, 0.8) 80%,
-      rgba(34, 34, 59, 0.8) 100%);
+  background: linear-gradient(
+    135deg,
+    $YEYO-VIOLET 0%,
+    rgba(26, 26, 46, 0.95) 20%,
+    rgba(22, 33, 62, 0.9) 40%,
+    rgba(15, 52, 96, 0.85) 60%,
+    rgba(34, 34, 59, 0.8) 80%,
+    rgba(34, 34, 59, 0.8) 100%
+  );
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
   position: relative;
@@ -256,8 +282,8 @@ onMounted(() => {
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2.5rem;
   }
 }
 
