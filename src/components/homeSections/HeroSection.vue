@@ -59,6 +59,7 @@ onUnmounted(() => {
       <SplineScene
         scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
         class="hero__spline"
+        relay
         @load="markHeroSplineReady"
         @error="markHeroSplineReady"
       />
@@ -217,7 +218,9 @@ onUnmounted(() => {
     position: absolute;
     inset: 0;
     z-index: 1;
-    pointer-events: auto; // Spline still gets mouse events for head tracking
+    // head tracking now comes from the document-level relay (see SplineScene),
+    // so the canvas never needs (or steals) real pointer events
+    pointer-events: none;
   }
 
   // ── Scroll indicator ──────────────────────────────────────────────────────

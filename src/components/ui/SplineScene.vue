@@ -7,6 +7,11 @@ import type { Application } from '@splinetool/runtime'
 interface Props {
   scene: string
   class?: string
+  // When true the canvas ignores real pointer events (so overlapping UI keeps
+  // working) and instead receives synthetic pointermove events relayed from
+  // document-level mouse/touch listeners — head tracking works across the
+  // whole page, including over text that covers the canvas, and on touch.
+  relay?: boolean
 }
 
 const props = defineProps<Props>()
@@ -29,6 +34,25 @@ const forceTransparentBg = (c: HTMLCanvasElement) => {
   rafFrame = requestAnimationFrame(tick)
 }
 
+const dispatchMove = (clientX: number, clientY: number) => {
+  canvas.value?.dispatchEvent(
+    new PointerEvent('pointermove', {
+      bubbles: true,
+      cancelable: true,
+      clientX,
+      clientY,
+      pointerType: 'mouse',
+      isPrimary: true,
+    }),
+  )
+}
+
+const onRelayMouse = (e: MouseEvent) => dispatchMove(e.clientX, e.clientY)
+const onRelayTouch = (e: TouchEvent) => {
+  const t = e.touches[0]
+  if (t) dispatchMove(t.clientX, t.clientY)
+}
+
 onMounted(async () => {
   if (!canvas.value) return
   try {
@@ -36,6 +60,11 @@ onMounted(async () => {
     app = new Application(canvas.value)
     await app.load(props.scene)
     forceTransparentBg(canvas.value)
+    if (props.relay) {
+      document.addEventListener('mousemove', onRelayMouse, { passive: true })
+      document.addEventListener('touchstart', onRelayTouch, { passive: true })
+      document.addEventListener('touchmove', onRelayTouch, { passive: true })
+    }
     isLoaded.value = true
     emit('load')
   } catch (e) {
@@ -46,6 +75,9 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (rafFrame !== null) cancelAnimationFrame(rafFrame)
+  document.removeEventListener('mousemove', onRelayMouse)
+  document.removeEventListener('touchstart', onRelayTouch)
+  document.removeEventListener('touchmove', onRelayTouch)
   app?.dispose()
 })
 </script>
@@ -57,7 +89,7 @@ onUnmounted(() => {
         <div class="loader" />
       </div>
     </Transition>
-    <canvas ref="canvas" class="spline-canvas" />
+    <canvas ref="canvas" class="spline-canvas" :class="{ 'spline-canvas--relay': props.relay }" />
   </div>
 </template>
 
@@ -82,6 +114,12 @@ onUnmounted(() => {
   height: 100%;
   display: block;
   background: transparent !important;
+
+  // Relay mode: synthetic events only — real pointer/touch pass through so
+  // overlapping text/buttons work and mobile scrolling is never hijacked.
+  &--relay {
+    pointer-events: none;
+  }
 }
 
 .fade-enter-active,
