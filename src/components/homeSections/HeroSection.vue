@@ -4,6 +4,7 @@ import SplineScene from '@/components/ui/SplineScene.vue'
 import HeroContent from './hero/HeroContent.vue'
 import { useGithub } from '@/composables/useGithub'
 import { useAppReady } from '@/composables/useAppReady'
+import HeroRobotHint from './hero/HeroRobotHint.vue'
 
 const isLoaded = ref(false)
 const mouseX = ref(0)
@@ -67,6 +68,7 @@ onUnmounted(() => {
     <div class="hero__container">
       <HeroContent :total-commits="totalCommits" />
     </div>
+    <HeroRobotHint />
     <div class="hero__scroll">
       <span>Scroll</span>
       <div class="hero__scroll-line" />

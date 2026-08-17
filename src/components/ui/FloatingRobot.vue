@@ -2,47 +2,24 @@
 import { useSplineRobot } from '@/composables/useSplineRobot'
 
 const {
-  heroCanvas,
-  footerCanvas,
+  companionCanvas,
   mobileCanvas,
-  isHeroLoaded,
-  isFooterLoaded,
+  isCompanionLoaded,
   isMobileLoaded,
   mobileExpanded,
-  heroOpacity,
-  footerOpacity,
+  companionOpacity,
 } = useSplineRobot()
 </script>
 
 <template>
-  <!-- ── Desktop: fixed right panel with TWO independent instances ─────────── -->
-  <div class="robot-desktop" aria-hidden="true">
-    <!-- Hero instance — visible in the hero section -->
-    <div
-      class="robot-desktop__zone"
-      :style="{ opacity: heroOpacity, transition: 'opacity 0.6s ease' }"
-    >
-      <Transition name="robot-fade">
-        <div v-if="!isHeroLoaded" class="robot-desktop__loader">
-          <div class="loader" />
-          <span>Loading...</span>
-        </div>
-      </Transition>
-      <canvas ref="heroCanvas" class="robot-desktop__canvas" />
-    </div>
-
-    <!-- Footer instance — visible near the footer, fresh tracking state -->
-    <div
-      class="robot-desktop__zone"
-      :style="{ opacity: footerOpacity, transition: 'opacity 0.6s ease' }"
-    >
-      <Transition name="robot-fade">
-        <div v-if="footerOpacity > 0 && !isFooterLoaded" class="robot-desktop__loader">
-          <div class="loader" />
-        </div>
-      </Transition>
-      <canvas ref="footerCanvas" class="robot-desktop__canvas" />
-    </div>
+  <!-- ── Desktop: mini companion — appears after the hero and never leaves ── -->
+  <div
+    class="robot-companion"
+    :class="{ 'robot-companion--visible': companionOpacity > 0 && isCompanionLoaded }"
+    :style="{ opacity: companionOpacity }"
+    aria-hidden="true"
+  >
+    <canvas ref="companionCanvas" class="robot-companion__canvas" />
   </div>
 
   <!-- ── Mobile: floating widget ─────────────────────────────────────────── -->

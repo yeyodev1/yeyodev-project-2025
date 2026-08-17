@@ -8,7 +8,8 @@ export default {
   hero: {
     available: 'Available for projects · Ecuador & Remote',
     greeting: "Hey, I'm",
-    alias: 'aka',
+    alias: 'also known as',
+    robotHint: 'Point or tap anywhere — the robot follows you',
     roles: ['Full Stack Dev', "CTO {'@'} Bakano", 'Vue.js Expert', 'AI Trainer', 'Tech Architect'],
     desc: 'Full Stack developer with <strong>6+ years</strong> building scalable systems. One of the early AI trainers on the team that shaped <strong>GPT-3 & GPT-3.5</strong> at Scale AI. CTO at Bakano. I read businesses like code — and turn what I see into software.',
     seeWork: 'See my work',
