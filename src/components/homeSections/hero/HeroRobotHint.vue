@@ -6,7 +6,7 @@ const { t } = useI18n()
 
 <template>
   <div class="robot-hint" aria-hidden="true">
-    <span class="robot-hint__eye">👀</span>
+    <i class="fa-solid fa-arrow-pointer robot-hint__eye" aria-hidden="true"></i>
     <span>{{ t('hero.robotHint') }}</span>
   </div>
 </template>
@@ -85,6 +85,8 @@ const { t } = useI18n()
 }
 
 .robot-hint__eye {
+  color: $accent-light;
+  font-size: 0.85rem;
   animation: hint-peek 2.4s ease-in-out infinite;
 }
 </style>

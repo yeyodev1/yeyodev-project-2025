@@ -23,7 +23,7 @@ const { t } = useLanguage()
 
   <!-- Error State -->
   <div v-else-if="state === 'error'" class="blog-error">
-    <div class="error-icon">⚠️</div>
+    <div class="error-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
     <h3>{{ t('blog.error.title') }}</h3>
     <p>{{ t('blog.error.message') }}</p>
     <button type="button" class="retry-btn" @click="emit('retry')">

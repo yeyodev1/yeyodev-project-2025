@@ -28,7 +28,7 @@ onMounted(() => {
       <div class="blog-hero__content" :class="{ 'blog-hero__content--visible': isVisible }">
         <!-- Badge -->
         <div class="blog-hero__badge">
-          <span class="badge-icon">✨</span>
+          <i class="fa-solid fa-wand-magic-sparkles badge-icon" aria-hidden="true"></i>
           <span>{{ t('blog.hero.badge') }}</span>
         </div>
 

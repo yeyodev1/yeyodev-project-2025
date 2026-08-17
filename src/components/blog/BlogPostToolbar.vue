@@ -39,7 +39,7 @@ const fontSizes: PostFontSize[] = ['small', 'medium', 'large']
       aria-label="Toggle dark mode"
       @click="emit('themeToggle')"
     >
-      {{ isDarkMode ? '☀️' : '🌙' }}
+      <i :class="isDarkMode ? 'fa-solid fa-sun' : 'fa-solid fa-moon'" aria-hidden="true"></i>
     </button>
   </div>
 </template>

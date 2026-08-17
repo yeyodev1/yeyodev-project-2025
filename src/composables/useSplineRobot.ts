@@ -1,40 +1,55 @@
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { Application } from '@splinetool/runtime'
 
 const SCENE = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
 
+// Travel waypoints: [scroll progress, horizontal position] where 0 = docked
+// right, 1 = docked left. The robot glides left ↔ right as you scroll so it
+// accompanies every section instead of sitting in a corner.
+const WAYPOINTS: Array<[number, number]> = [
+  [0.14, 0],
+  [0.32, 1],
+  [0.52, 0],
+  [0.72, 1],
+  [0.9, 0],
+]
+
+const travelFraction = (p: number): number => {
+  if (p <= WAYPOINTS[0][0]) return WAYPOINTS[0][1]
+  for (let i = 0; i < WAYPOINTS.length - 1; i++) {
+    const [p0, f0] = WAYPOINTS[i]
+    const [p1, f1] = WAYPOINTS[i + 1]
+    if (p <= p1) return f0 + ((p - p0) / (p1 - p0)) * (f1 - f0)
+  }
+  return WAYPOINTS[WAYPOINTS.length - 1][1]
+}
+
 export function useSplineRobot() {
-  // ── Canvas refs ─────────────────────────────────────────────────────────────
+  const companionEl = ref<HTMLElement | null>(null)
   const companionCanvas = ref<HTMLCanvasElement | null>(null)
-  const mobileCanvas = ref<HTMLCanvasElement | null>(null)
 
-  // ── App instances ───────────────────────────────────────────────────────────
   let companionApp: Application | null = null
-  let mobileApp: Application | null = null
-
-  // ── State ───────────────────────────────────────────────────────────────────
   const isCompanionLoaded = ref(false)
-  const isMobileLoaded = ref(false)
-  const mobileExpanded = ref(false)
 
-  // The mini companion fades in once the user leaves the hero (the hero has its
-  // own full-size robot) and stays visible all the way down — it never leaves.
   const companionOpacity = ref(0)
+  const companionTx = ref(0)
 
   let cleanupRelay: (() => void) | null = null
   const bgCleanups: (() => void)[] = []
 
-  // ── Scroll handler ──────────────────────────────────────────────────────────
+  // ── Scroll handler — opacity + horizontal travel ───────────────────────────
   const handleScroll = () => {
     const p = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight)
 
-    // Invisible over the hero, fades in 12–20 %, then stays with you forever
+    // Invisible over the hero (it has its own full-size robot), fades in
+    // 12–20 %, then travels with you all the way down — it never leaves
     companionOpacity.value = p < 0.12 ? 0 : p < 0.2 ? (p - 0.12) / 0.08 : 1
 
-    // Lazy-load right before it becomes visible — desktop only: below lg the
-    // canvas is display:none (zero-sized) and Spline would init broken (and
-    // waste ~4 MB on phones)
-    if (p > 0.08 && !companionApp && window.innerWidth >= 1024) loadCompanion()
+    const w = companionEl.value?.offsetWidth ?? 230
+    const range = Math.max(0, window.innerWidth - w - 24)
+    companionTx.value = -travelFraction(p) * range
+
+    if (p > 0.08 && !companionApp) loadCompanion()
   }
 
   // ── Force WebGL clear-color to transparent ──────────────────────────────────
@@ -51,24 +66,20 @@ export function useSplineRobot() {
     bgCleanups.push(() => cancelAnimationFrame(frame))
   }
 
-  // ── Mouse/touch relay for the companion canvas ─────────────────────────────
-  // Maps the full viewport onto the mini canvas so the little robot tracks the
-  // cursor (or finger) anywhere on the page. Y follows the cursor too, but
-  // squeezed into the 20–85 % band of the canvas — natural gaze, no
-  // ceiling/floor staring at the extremes.
+  // ── Mouse/touch relay — full viewport mapped onto the mini canvas ──────────
+  // X and Y both follow the cursor/finger; Y is squeezed into the 20–85 % band
+  // of the canvas so the gaze stays natural (no ceiling/floor staring).
   const buildRelay = (canvas: HTMLCanvasElement) => {
     const fire = (clientX: number, clientY: number) => {
       const rect = canvas.getBoundingClientRect()
       const fx = clientX / window.innerWidth
       const fy = clientY / window.innerHeight
-      const mappedX = rect.left + fx * rect.width
-      const mappedY = rect.top + (0.2 + 0.65 * fy) * rect.height
       canvas.dispatchEvent(
         new PointerEvent('pointermove', {
           bubbles: true,
           cancelable: true,
-          clientX: mappedX,
-          clientY: mappedY,
+          clientX: rect.left + fx * rect.width,
+          clientY: rect.top + (0.2 + 0.65 * fy) * rect.height,
           pointerType: 'mouse',
           isPrimary: true,
         }),
@@ -111,26 +122,14 @@ export function useSplineRobot() {
     isCompanionLoaded.value = true
   }
 
-  // ── Load mobile (lazy on widget expand) ────────────────────────────────────
-  const loadMobile = async () => {
-    if (!mobileCanvas.value || mobileApp) return
-    mobileApp = new Application(mobileCanvas.value)
-    await mobileApp.load(SCENE)
-    isMobileLoaded.value = true
-  }
-
-  watch(mobileExpanded, async (val) => {
-    if (val && !mobileApp) await loadMobile()
-  })
-
   onMounted(() => {
     window.addEventListener('scroll', handleScroll, { passive: true })
     document.addEventListener('wheel', blockSplineWheel, { passive: true })
+    handleScroll()
   })
 
   onUnmounted(() => {
     companionApp?.dispose()
-    mobileApp?.dispose()
     cleanupRelay?.()
     bgCleanups.forEach((fn) => fn())
     window.removeEventListener('scroll', handleScroll)
@@ -138,11 +137,10 @@ export function useSplineRobot() {
   })
 
   return {
+    companionEl,
     companionCanvas,
-    mobileCanvas,
     isCompanionLoaded,
-    isMobileLoaded,
-    mobileExpanded,
     companionOpacity,
+    companionTx,
   }
 }
