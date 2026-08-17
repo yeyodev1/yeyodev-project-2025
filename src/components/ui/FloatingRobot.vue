@@ -16,7 +16,9 @@ const { companionEl, companionCanvas, isCompanionLoaded, companionOpacity, compa
     :style="{ opacity: companionOpacity, transform: `translateX(${companionTx}px)` }"
     aria-hidden="true"
   >
-    <canvas ref="companionCanvas" class="robot-companion__canvas" />
+    <div class="robot-companion__stage">
+      <canvas ref="companionCanvas" class="robot-companion__canvas" />
+    </div>
   </div>
 </template>
 

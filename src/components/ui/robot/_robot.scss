@@ -1,17 +1,19 @@
 @use 'index' as *;
 
 // ── Companion robot — travels with the user between sections ─────────────────
-// Anchored bottom-right; JS drives translateX so it glides left ↔ right as
-// you scroll. The transform transition turns waypoint updates into a smooth
-// walk instead of a teleport.
+// The stage replicates the hero's geometry exactly: a full-viewport canvas
+// scaled down with CSS. Spline therefore sees the same canvas size and the
+// same pointer offsets that make the hero robot track beautifully — the mini
+// robot is literally the hero robot in miniature.
 .robot-companion {
   position: fixed;
   bottom: 0.25rem;
   right: 0.75rem;
   width: 150px;
-  height: 195px;
+  height: 200px;
   z-index: 60;
   pointer-events: none;
+  --s: 0.22;
   transition:
     transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
     opacity 0.4s ease;
@@ -21,6 +23,18 @@
     bottom: 0.5rem;
     width: 230px;
     height: 300px;
+    --s: 0.32;
+  }
+
+  &__stage {
+    position: absolute;
+    width: 100vw;
+    height: 100dvh;
+    transform: scale(var(--s));
+    transform-origin: top left;
+    // center the scene (robot lives at its middle) on this box, feet at bottom
+    left: calc(50% - 50vw * var(--s));
+    top: calc(100% - 100dvh * var(--s));
   }
 
   &__canvas {

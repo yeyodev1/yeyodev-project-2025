@@ -66,20 +66,22 @@ export function useSplineRobot() {
     bgCleanups.push(() => cancelAnimationFrame(frame))
   }
 
-  // ── Mouse/touch relay — full viewport mapped onto the mini canvas ──────────
-  // X and Y both follow the cursor/finger; Y is squeezed into the 20–85 % band
-  // of the canvas so the gaze stays natural (no ceiling/floor staring).
+  // ── Mouse/touch relay ──────────────────────────────────────────────────────
+  // The stage is a full-viewport canvas scaled down by CSS, so to make Spline
+  // perceive the pointer at the cursor's true viewport position we dispatch at
+  // rect.origin + cursor * scale. Both ways Spline can derive the offset
+  // (browser inverse-transform, or client-minus-rect normalized by rect size)
+  // resolve to the same full-viewport coordinates the hero robot receives.
   const buildRelay = (canvas: HTMLCanvasElement) => {
     const fire = (clientX: number, clientY: number) => {
       const rect = canvas.getBoundingClientRect()
-      const fx = clientX / window.innerWidth
-      const fy = clientY / window.innerHeight
+      const s = rect.width / (canvas.clientWidth || 1)
       canvas.dispatchEvent(
         new PointerEvent('pointermove', {
           bubbles: true,
           cancelable: true,
-          clientX: rect.left + fx * rect.width,
-          clientY: rect.top + (0.2 + 0.65 * fy) * rect.height,
+          clientX: rect.left + clientX * s,
+          clientY: rect.top + clientY * s,
           pointerType: 'mouse',
           isPrimary: true,
         }),
