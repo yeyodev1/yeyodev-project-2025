@@ -31,8 +31,10 @@ export function useSplineRobot() {
     // Invisible over the hero, fades in 12–20 %, then stays with you forever
     companionOpacity.value = p < 0.12 ? 0 : p < 0.2 ? (p - 0.12) / 0.08 : 1
 
-    // Lazy-load right before it becomes visible
-    if (p > 0.08 && !companionApp) loadCompanion()
+    // Lazy-load right before it becomes visible — desktop only: below lg the
+    // canvas is display:none (zero-sized) and Spline would init broken (and
+    // waste ~4 MB on phones)
+    if (p > 0.08 && !companionApp && window.innerWidth >= 1024) loadCompanion()
   }
 
   // ── Force WebGL clear-color to transparent ──────────────────────────────────
@@ -50,13 +52,17 @@ export function useSplineRobot() {
   }
 
   // ── Mouse/touch relay for the companion canvas ─────────────────────────────
-  // Maps full-viewport X → canvas width so the little robot tracks the cursor
-  // (or finger) anywhere on the page. Y stays centered — no ceiling-staring.
+  // Maps the full viewport onto the mini canvas so the little robot tracks the
+  // cursor (or finger) anywhere on the page. Y follows the cursor too, but
+  // squeezed into the 20–85 % band of the canvas — natural gaze, no
+  // ceiling/floor staring at the extremes.
   const buildRelay = (canvas: HTMLCanvasElement) => {
-    const fire = (clientX: number) => {
+    const fire = (clientX: number, clientY: number) => {
       const rect = canvas.getBoundingClientRect()
-      const mappedX = rect.left + (clientX / window.innerWidth) * rect.width
-      const mappedY = rect.top + rect.height * 0.5
+      const fx = clientX / window.innerWidth
+      const fy = clientY / window.innerHeight
+      const mappedX = rect.left + fx * rect.width
+      const mappedY = rect.top + (0.2 + 0.65 * fy) * rect.height
       canvas.dispatchEvent(
         new PointerEvent('pointermove', {
           bubbles: true,
@@ -69,10 +75,10 @@ export function useSplineRobot() {
       )
     }
 
-    const onMove = (e: MouseEvent) => fire(e.clientX)
+    const onMove = (e: MouseEvent) => fire(e.clientX, e.clientY)
     const onTouch = (e: TouchEvent) => {
       const t = e.touches[0]
-      if (t) fire(t.clientX)
+      if (t) fire(t.clientX, t.clientY)
     }
 
     document.addEventListener('mousemove', onMove, { passive: true })
@@ -101,7 +107,7 @@ export function useSplineRobot() {
     const relay = buildRelay(companionCanvas.value)
     cleanupRelay = relay.cleanup
     // Fire a centered event so the robot starts looking straight ahead
-    setTimeout(() => relay.fire(window.innerWidth / 2), 120)
+    setTimeout(() => relay.fire(window.innerWidth / 2, window.innerHeight * 0.5), 120)
     isCompanionLoaded.value = true
   }
 
