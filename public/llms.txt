@@ -18,7 +18,7 @@ Diego Reyes (known online as "Yeyo") is a Full Stack developer with 6+ years of 
 - **Backend:** Node.js, Express, REST APIs, WebSockets
 - **Database:** MongoDB, PostgreSQL
 - **AI / ML:** LLM integration, AI training (Scale AI), data pipelines, automation
-- **DevOps:** Netlify, Render, Docker basics, CI/CD
+- **DevOps:** Vercel, Render, Docker basics, CI/CD
 - **Integrations:** Contifico (Ecuador billing), Stripe, WhatsApp API, third-party APIs
 
 ## Services Offered

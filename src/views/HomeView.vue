@@ -1,9 +1,19 @@
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
 import HeroSection from '@/components/homeSections/HeroSection.vue'
-import ProjectSection from '@/components/homeSections/ProjectSection.vue'
-import ServicesSection from '@/components/homeSections/ServicesSection.vue'
-import GithubSection from '@/components/homeSections/GithubSection.vue'
-import ContactSection from '@/components/homeSections/ContactSection.vue'
+import SectionLoader from '@/components/preloader/SectionLoader.vue'
+
+const lazySection = (loader: () => Promise<any>) =>
+  defineAsyncComponent({
+    loader,
+    loadingComponent: SectionLoader,
+    delay: 0,
+  })
+
+const ProjectSection = lazySection(() => import('@/components/homeSections/ProjectSection.vue'))
+const ServicesSection = lazySection(() => import('@/components/homeSections/ServicesSection.vue'))
+const GithubSection = lazySection(() => import('@/components/homeSections/GithubSection.vue'))
+const ContactSection = lazySection(() => import('@/components/homeSections/ContactSection.vue'))
 </script>
 
 <template>

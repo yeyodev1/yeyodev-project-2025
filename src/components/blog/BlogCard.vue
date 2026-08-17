@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLanguage } from '@/composables/useLanguage'
-import { useBlog } from '@/composables/useBlog'
 import type { BlogPost } from '@/composables/useBlog'
+import BlogCardImage from '@/components/blog/BlogCardImage.vue'
+import BlogCardMeta from '@/components/blog/BlogCardMeta.vue'
+import BlogCardFooter from '@/components/blog/BlogCardFooter.vue'
 
 interface Props {
   post: BlogPost
@@ -14,20 +15,6 @@ const props = defineProps<Props>()
 
 const router = useRouter()
 const { t } = useLanguage()
-const { formatDate } = useBlog()
-
-// Computed properties
-const formattedDate = computed(() => {
-  return formatDate(props.post.publishedAt)
-})
-
-const readingTimeText = computed(() => {
-  return t('blog.card.readingTime', { minutes: props.post.readingTime })
-})
-
-const categoryText = computed(() => {
-  return props.post.category.charAt(0).toUpperCase() + props.post.category.slice(1)
-})
 
 // Métodos
 const navigateToPost = () => {
@@ -56,72 +43,11 @@ const handleKeydown = (event: KeyboardEvent) => {
     @click="navigateToPost"
     @keydown="handleKeydown"
   >
-    <!-- Imagen de portada -->
-    <div class="blog-card__image">
-      <img
-        :src="post.coverImage.url"
-        :alt="post.coverImage.alt"
-        loading="lazy"
-        class="cover-image"
-      />
-
-      <!-- Badge de featured -->
-      <div v-if="post.featured" class="featured-badge">
-        <svg class="featured-icon" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z"
-            fill="currentColor"
-          />
-        </svg>
-        <span>{{ t('blog.card.featured') }}</span>
-      </div>
-
-      <!-- Overlay de hover -->
-      <div class="image-overlay">
-        <div class="overlay-content">
-          <svg class="read-icon" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M7 17L17 7M17 7H7M17 7V17"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          <span>{{ t('blog.card.readMore') }}</span>
-        </div>
-      </div>
-    </div>
+    <BlogCardImage :post="post" />
 
     <!-- Contenido -->
     <div class="blog-card__content">
-      <!-- Meta información -->
-      <div class="blog-card__meta">
-        <div class="meta-left">
-          <span class="category-tag">
-            {{ categoryText }}
-          </span>
-          <span class="meta-divider">•</span>
-          <time :datetime="post.publishedAt" class="publish-date">
-            {{ formattedDate }}
-          </time>
-        </div>
-        <div class="meta-right">
-          <div class="reading-time">
-            <svg class="clock-icon" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-              <path
-                d="M12 6V12L16 14"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span>{{ readingTimeText }}</span>
-          </div>
-        </div>
-      </div>
+      <BlogCardMeta :post="post" />
 
       <!-- Título -->
       <h2 class="blog-card__title">
@@ -139,34 +65,7 @@ const handleKeydown = (event: KeyboardEvent) => {
         <span v-if="post.tags.length > 3" class="tag tag--more"> +{{ post.tags.length - 3 }} </span>
       </div>
 
-      <!-- Footer -->
-      <div class="blog-card__footer">
-        <div class="author-info">
-          <img
-            :src="post.author.avatar"
-            :alt="post.author.name"
-            class="author-avatar"
-            loading="lazy"
-          />
-          <div class="author-details">
-            <span class="author-name">{{ post.author.name }}</span>
-            <span class="author-role">{{ t('blog.card.author') }}</span>
-          </div>
-        </div>
-
-        <button class="read-more-btn" :aria-label="t('blog.card.readPost', { title: post.title })">
-          <span>{{ t('blog.card.readMore') }}</span>
-          <svg class="arrow-icon" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M7 17L17 7M17 7H7M17 7V17"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
+      <BlogCardFooter :post="post" />
     </div>
   </article>
 </template>
@@ -191,11 +90,11 @@ const handleKeydown = (event: KeyboardEvent) => {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     border-color: rgba(79, 172, 254, 0.3);
 
-    .cover-image {
+    :deep(.cover-image) {
       transform: scale(1.05);
     }
 
-    .image-overlay {
+    :deep(.image-overlay) {
       opacity: 1;
     }
 
@@ -203,7 +102,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       color: #4facfe;
     }
 
-    .read-more-btn {
+    :deep(.read-more-btn) {
       background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
       color: white;
 
@@ -283,116 +182,9 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-// Imagen
-.blog-card__image {
-  position: relative;
-  overflow: hidden;
-
-  .cover-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-  }
-
-  .featured-badge {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.5rem 0.75rem;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    border-radius: 20px;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 600;
-    z-index: 2;
-
-    .featured-icon {
-      width: 14px;
-      height: 14px;
-    }
-  }
-
-  .image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(79, 172, 254, 0.8) 0%, rgba(0, 242, 254, 0.6) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-
-    .overlay-content {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: white;
-      font-weight: 600;
-      font-size: 1rem;
-
-      .read-icon {
-        width: 20px;
-        height: 20px;
-      }
-    }
-  }
-}
-
 // Contenido
 .blog-card__content {
   color: white;
-}
-
-.blog-card__meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-
-  .meta-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .category-tag {
-    background: rgba(79, 172, 254, 0.2);
-    color: #4facfe;
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .meta-divider {
-    color: rgba(255, 255, 255, 0.3);
-  }
-
-  .publish-date {
-    color: rgba(255, 255, 255, 0.7);
-  }
-
-  .reading-time {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    color: rgba(255, 255, 255, 0.6);
-
-    .clock-icon {
-      width: 14px;
-      height: 14px;
-    }
-  }
 }
 
 .blog-card__title {
@@ -440,68 +232,6 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-.blog-card__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  .author-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .author-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .author-details {
-    display: flex;
-    flex-direction: column;
-
-    .author-name {
-      font-weight: 600;
-      color: white;
-      font-size: 0.875rem;
-    }
-
-    .author-role {
-      font-size: 0.75rem;
-      color: rgba(255, 255, 255, 0.6);
-    }
-  }
-
-  .read-more-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    color: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    font-size: 0.875rem;
-
-    .arrow-icon {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.3s ease;
-    }
-
-    &:hover {
-      transform: translateY(-1px);
-    }
-  }
-}
-
-// Animaciones
 @keyframes cardFadeIn {
   to {
     opacity: 1;
@@ -550,17 +280,6 @@ const handleKeydown = (event: KeyboardEvent) => {
       }
     }
   }
-
-  .blog-card__footer {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-start;
-
-    .read-more-btn {
-      align-self: stretch;
-      justify-content: center;
-    }
-  }
 }
 
 @media (max-width: 480px) {
@@ -570,12 +289,6 @@ const handleKeydown = (event: KeyboardEvent) => {
         padding: 1rem;
       }
     }
-  }
-
-  .blog-card__meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
   }
 
   .blog-card__tags {

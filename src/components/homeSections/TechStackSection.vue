@@ -1,80 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import TechCategoryCard from './techstack/TechCategoryCard.vue'
+import { techCategories } from './techstack/techStackData'
 
 const isVisible = ref(false)
-const hoveredSkill = ref<string | null>(null)
-
-const techCategories = [
-  {
-    name: 'Frontend',
-    icon: '🎨',
-    color: '#42b883',
-    skills: [
-      {
-        name: 'Vue.js',
-        level: 95,
-        description: 'Framework progresivo — SPA, SSR, ecosistema completo',
-      },
-      { name: 'TypeScript', level: 92, description: 'Tipado robusto para apps a escala' },
-      {
-        name: 'Tailwind CSS',
-        level: 90,
-        description: 'Utilidades primero, diseño rápido y consistente',
-      },
-      { name: 'SCSS', level: 88, description: 'Arquitectura BEM, variables, mixins avanzados' },
-      { name: 'Vite', level: 90, description: 'Build tool ultrarrápido con HMR instantáneo' },
-    ],
-  },
-  {
-    name: 'Backend',
-    icon: '⚙️',
-    color: '#ff6b6b',
-    skills: [
-      { name: 'Node.js', level: 88, description: 'APIs REST, websockets, serverless' },
-      { name: 'Express / Fastify', level: 85, description: 'Frameworks web ligeros y eficientes' },
-      { name: 'MongoDB', level: 80, description: 'Esquemas flexibles, agregaciones, índices' },
-      { name: 'PostgreSQL', level: 75, description: 'SQL relacional, consultas complejas' },
-    ],
-  },
-  {
-    name: 'AI & Data',
-    icon: '🤖',
-    color: '#f59e0b',
-    skills: [
-      {
-        name: 'LLM Integration',
-        level: 85,
-        description: 'OpenAI, Claude, Gemini — APIs y fine-tuning',
-      },
-      { name: 'AI Training', level: 80, description: 'Entrené modelos en Scale AI para GPT-3/3.5' },
-      {
-        name: 'Data Pipelines',
-        level: 75,
-        description: 'ETL, automatización, procesamiento de datos',
-      },
-      { name: 'Python', level: 78, description: 'Scripting, análisis de datos, automatización' },
-    ],
-  },
-  {
-    name: 'Tools & DevOps',
-    icon: '🛠️',
-    color: '#4ecdc4',
-    skills: [
-      { name: 'Git', level: 92, description: 'Control de versiones, flujos colaborativos' },
-      { name: 'Docker', level: 78, description: 'Contenedores, entornos reproducibles' },
-      { name: 'Netlify / Vercel', level: 88, description: 'Deploy automático, edge functions' },
-      { name: 'CI/CD', level: 82, description: 'Integración y despliegue continuo automatizado' },
-    ],
-  },
-]
-
-const handleSkillHover = (skillName: string) => {
-  hoveredSkill.value = skillName
-}
-
-const handleSkillLeave = () => {
-  hoveredSkill.value = null
-}
 
 onMounted(() => {
   setTimeout(() => {
@@ -100,91 +29,18 @@ onMounted(() => {
       </header>
 
       <div class="stack__categories">
-        <div
+        <TechCategoryCard
           v-for="(category, categoryIndex) in techCategories"
           :key="category.name"
-          class="stack__category"
-          :style="{
-            '--category-color': category.color,
-            '--category-delay': categoryIndex,
-          }"
-        >
-          <div class="stack__category-header">
-            <span class="stack__category-icon">{{ category.icon }}</span>
-            <h3 class="stack__category-title">{{ category.name }}</h3>
-          </div>
-
-          <div class="stack__skills-grid">
-            <div
-              v-for="(skill, skillIndex) in category.skills"
-              :key="skill.name"
-              class="stack__skill"
-              :style="{
-                '--skill-delay': skillIndex,
-                '--skill-level': skill.level + '%',
-              }"
-              @mouseenter="handleSkillHover(skill.name)"
-              @mouseleave="handleSkillLeave"
-            >
-              <div class="stack__skill-content">
-                <div class="stack__skill-header">
-                  <span class="stack__skill-name">{{ skill.name }}</span>
-                  <span class="stack__skill-level">{{ skill.level }}%</span>
-                </div>
-                <div class="stack__skill-bar">
-                  <div class="stack__skill-progress"></div>
-                </div>
-              </div>
-
-              <div
-                class="stack__skill-tooltip"
-                :class="{ 'is-visible': hoveredSkill === skill.name }"
-              >
-                {{ skill.description }}
-              </div>
-            </div>
-          </div>
-        </div>
+          :category="category"
+          :category-index="categoryIndex"
+        />
       </div>
     </div>
   </section>
 </template>
 
 <style lang="scss" scoped>
-@keyframes category-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(50px) scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes skill-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes progress-fill {
-  from {
-    width: 0;
-  }
-
-  to {
-    width: var(--skill-level);
-  }
-}
-
 @keyframes float {
   0%,
   100% {
@@ -193,16 +49,6 @@ onMounted(() => {
 
   50% {
     transform: translateY(-20px);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
   }
 }
 
@@ -287,188 +133,6 @@ onMounted(() => {
   }
 }
 
-.stack__category {
-  opacity: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 24px;
-  padding: 2.5rem;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 24px;
-    background: linear-gradient(135deg, var(--category-color), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-  }
-
-  &:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-
-    &::before {
-      opacity: 0.1;
-    }
-  }
-
-  .stack.is-visible & {
-    animation: category-fade-in 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    animation-delay: calc(var(--category-delay) * 200ms);
-  }
-}
-
-.stack__category-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(79, 172, 254, 0.3);
-}
-
-.stack__category-icon {
-  font-size: 2rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.stack__category-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  margin: 0;
-}
-
-.stack__skills-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.stack__skill {
-  opacity: 0;
-  position: relative;
-
-  .stack.is-visible & {
-    animation: skill-slide-in 0.6s ease-out forwards;
-    animation-delay: calc(var(--category-delay) * 200ms + var(--skill-delay) * 100ms + 300ms);
-  }
-}
-
-.stack__skill-content {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    transform: translateX(4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    border-color: rgba(79, 172, 254, 0.3);
-  }
-}
-
-.stack__skill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.stack__skill-name {
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 1rem;
-}
-
-.stack__skill-level {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #4facfe;
-  background: rgba(79, 172, 254, 0.1);
-  border: 1px solid rgba(79, 172, 254, 0.2);
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-}
-
-.stack__skill-bar {
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-}
-
-.stack__skill-progress {
-  height: 100%;
-  background: var(--category-color);
-  border-radius: 3px;
-  width: 0;
-  position: relative;
-
-  .stack.is-visible & {
-    animation: progress-fill 1.5s ease-out forwards;
-    animation-delay: calc(var(--category-delay) * 200ms + var(--skill-delay) * 100ms + 800ms);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: shimmer 2s infinite;
-  }
-}
-
-.stack__skill-tooltip {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-8px);
-  background: rgba(34, 34, 59, 0.95);
-  color: white;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 10;
-  backdrop-filter: blur(10px);
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: rgba(34, 34, 59, 0.95);
-  }
-
-  &.is-visible {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(-12px);
-  }
-}
-
 .stack__bg-elements {
   position: absolute;
   top: 0;
@@ -513,28 +177,6 @@ onMounted(() => {
 @media (max-width: 640px) {
   .stack {
     padding: 4rem 1rem;
-  }
-
-  .stack__category {
-    padding: 2rem;
-  }
-
-  .stack__skill-content {
-    padding: 1.25rem;
-  }
-
-  .stack__skill-tooltip {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    transform: none;
-    white-space: normal;
-    text-align: center;
-
-    &::after {
-      display: none;
-    }
   }
 }
 </style>
