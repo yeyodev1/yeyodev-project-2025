@@ -11,6 +11,8 @@ let raf = 0
 let pageLoaded = document.readyState === 'complete'
 const start = performance.now()
 const MIN_DURATION = 1600
+// don't hold the page hostage waiting for heavy assets (Spline runtime is ~4MB)
+const MAX_WAIT = 4000
 
 const onLoad = () => {
   pageLoaded = true
@@ -18,10 +20,10 @@ const onLoad = () => {
 
 const tick = (now: number) => {
   const elapsed = now - start
-  // ease toward 90% while loading, snap to 100% when page + min time ready
-  const target = pageLoaded ? 100 : Math.min(90, (elapsed / 2500) * 100)
+  const ready = pageLoaded || elapsed >= MAX_WAIT
+  const target = ready ? 100 : Math.min(90, (elapsed / 2500) * 100)
   progress.value += (target - progress.value) * 0.08
-  if (progress.value > 99.2 && pageLoaded && elapsed >= MIN_DURATION) {
+  if (progress.value > 99.2 && ready && elapsed >= MIN_DURATION) {
     progress.value = 100
     leaving.value = true
     window.setTimeout(() => emit('done'), 900)
