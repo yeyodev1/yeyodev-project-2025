@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useAppReady } from '@/composables/useAppReady'
 
 const emit = defineEmits<{ (e: 'done'): void }>()
+
+const { heroSplineReady } = useAppReady()
 
 const progress = ref(0)
 const leaving = ref(false)
@@ -11,8 +14,10 @@ let raf = 0
 let pageLoaded = document.readyState === 'complete'
 const start = performance.now()
 const MIN_DURATION = 1600
-// don't hold the page hostage waiting for heavy assets (Spline runtime is ~4MB)
-const MAX_WAIT = 4000
+// The home route waits for the hero Spline robot; other routes just wait for
+// window load. Both have a hard cap so a failed download can't hang the site.
+const isHome = window.location.pathname === '/'
+const MAX_WAIT = isHome ? 12000 : 4000
 
 const onLoad = () => {
   pageLoaded = true
@@ -24,8 +29,9 @@ const tick = (now: number) => {
   const elapsed = now - start
   const dt = now - last
   last = now
-  const ready = pageLoaded || elapsed >= MAX_WAIT
-  const target = ready ? 100 : Math.min(90, (elapsed / 2500) * 100)
+  const loadedSignal = isHome ? heroSplineReady.value : pageLoaded
+  const ready = loadedSignal || elapsed >= MAX_WAIT
+  const target = ready ? 100 : Math.min(90, (elapsed / 4000) * 100)
   // dt-scaled easing: progress advances by wall-clock time, not frame count,
   // so heavy main-thread work (Spline parsing) can't stall the counter
   progress.value += (target - progress.value) * Math.min(1, (dt / 16) * 0.08)

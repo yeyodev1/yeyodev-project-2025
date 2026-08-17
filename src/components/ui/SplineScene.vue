@@ -10,6 +10,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits<{ (e: 'load'): void; (e: 'error'): void }>()
 const canvas = ref<HTMLCanvasElement | null>(null)
 const isLoaded = ref(false)
 let app: Application | null = null
@@ -36,8 +37,10 @@ onMounted(async () => {
     await app.load(props.scene)
     forceTransparentBg(canvas.value)
     isLoaded.value = true
+    emit('load')
   } catch (e) {
     console.error('[SplineScene] failed to load scene', e)
+    emit('error')
   }
 })
 

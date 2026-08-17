@@ -3,6 +3,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import SplineScene from '@/components/ui/SplineScene.vue'
 import HeroContent from './hero/HeroContent.vue'
 import { useGithub } from '@/composables/useGithub'
+import { useAppReady } from '@/composables/useAppReady'
 
 const isLoaded = ref(false)
 const mouseX = ref(0)
@@ -13,6 +14,7 @@ const glowX = ref(50)
 const glowY = ref(50)
 
 const { totalCommits, load: loadGithub } = useGithub()
+const { markHeroSplineReady } = useAppReady()
 
 const handleMouseMove = (e: MouseEvent) => {
   const rect = heroRef.value?.getBoundingClientRect()
@@ -57,6 +59,8 @@ onUnmounted(() => {
       <SplineScene
         scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
         class="hero__spline"
+        @load="markHeroSplineReady"
+        @error="markHeroSplineReady"
       />
     </div>
     <div class="hero__container">
