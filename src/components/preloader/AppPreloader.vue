@@ -18,11 +18,17 @@ const onLoad = () => {
   pageLoaded = true
 }
 
+let last = start
+
 const tick = (now: number) => {
   const elapsed = now - start
+  const dt = now - last
+  last = now
   const ready = pageLoaded || elapsed >= MAX_WAIT
   const target = ready ? 100 : Math.min(90, (elapsed / 2500) * 100)
-  progress.value += (target - progress.value) * 0.08
+  // dt-scaled easing: progress advances by wall-clock time, not frame count,
+  // so heavy main-thread work (Spline parsing) can't stall the counter
+  progress.value += (target - progress.value) * Math.min(1, (dt / 16) * 0.08)
   if (progress.value > 99.2 && ready && elapsed >= MIN_DURATION) {
     progress.value = 100
     leaving.value = true
